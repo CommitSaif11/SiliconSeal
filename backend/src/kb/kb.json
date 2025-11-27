@@ -1,0 +1,194 @@
+[
+  {
+    "part_id": "stm32f030c8t6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F030C8T6",
+    "package": "LQFP-48 / QFN-48",
+    "logo_hint": "STMI",
+    "patterns": {
+      "part_code": "\\bSTM32F030C8T6\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "w25q64jvs1q",
+    "oem": "Winbond",
+    "part_number": "W25Q64JVS1Q",
+    "package": "SOIC-8",
+    "logo_hint": "WINB",
+    "patterns": {
+      "part_code": "\\bW25Q64JVS1Q\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "ina219",
+    "oem": "Texas Instruments",
+    "part_number": "INA219",
+    "package": "SOIC-8 / SOT-23-8",
+    "logo_hint": "TEXA",
+    "patterns": {
+      "part_code": "\\bINA219\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "ads1113",
+    "oem": "Texas Instruments",
+    "part_number": "ADS1113",
+    "package": "X2QFN-10 / SOT-10 / VSSOP-10",
+    "logo_hint": "TEXA",
+    "patterns": {
+      "part_code": "\\bADS1113\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "mcp6001",
+    "oem": "Microchip",
+    "part_number": "MCP6001",
+    "package": "SC-70-5 / SOT-23-5",
+    "logo_hint": "MICR",
+    "patterns": {
+      "part_code": "\\bMCP6001\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "lm358",
+    "oem": "Texas Instruments",
+    "part_number": "LM358",
+    "package": "SOIC-8 / SOT-23-8 / TSSOP-8 / PDIP-8",
+    "logo_hint": "TEXA",
+    "patterns": {
+      "part_code": "\\bLM358\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "sn74lvc1g04",
+    "oem": "Texas Instruments",
+    "part_number": "SN74LVC1G04",
+    "package": "SOT-23-5 / SC70-5",
+    "logo_hint": "TEXA",
+    "patterns": {
+      "part_code": "\\bSN74LVC1G04\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "74hc1474hct14",
+    "oem": "Nexperia",
+    "part_number": "74HC14 / 74HCT14",
+    "package": "SO14 / TSSOP14 / DHVQFN14",
+    "logo_hint": "NEXP",
+    "patterns": {
+      "part_code": "\\b(74HC14|74HCT14)\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "sn74hc595",
+    "oem": "Texas Instruments",
+    "part_number": "SN74HC595",
+    "package": "SOIC-16 / TSSOP-16 / SSOP-16 / PDIP-16",
+    "logo_hint": "TEXA",
+    "patterns": {
+      "part_code": "\\bSN74HC595\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "lm2596",
+    "oem": "ON Semiconductor",
+    "part_number": "LM2596",
+    "package": "TO-220 / D2PAK",
+    "logo_hint": "ONSE",
+    "patterns": {
+      "part_code": "\\bLM2596\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "tps5430",
+    "oem": "Texas Instruments",
+    "part_number": "TPS5430",
+    "package": "SOIC-8 / PowerPAD-8",
+    "logo_hint": "TEXA",
+    "patterns": {
+      "part_code": "\\bTPS5430\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "ams1117",
+    "oem": "Advanced Monolithic Systems",
+    "part_number": "AMS1117",
+    "package": "SOT-223 / TO-252 / SOIC-8",
+    "logo_hint": "ADVA",
+    "patterns": {
+      "part_code": "\\bAMS1117\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "lm1117",
+    "oem": "ON Semiconductor",
+    "part_number": "LM1117",
+    "package": "SOT-223",
+    "logo_hint": "ONSE",
+    "patterns": {
+      "part_code": "\\bLM1117\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "at24c04cat24c08c",
+    "oem": "Microchip",
+    "part_number": "AT24C04C / AT24C08C",
+    "package": "SOIC-8 / TSSOP-8 / SOT-23-5 / PDIP-8",
+    "logo_hint": "MICR",
+    "patterns": {
+      "part_code": "\\b(AT24C04C|AT24C08C)\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "msp430g2553",
+    "oem": "Texas Instruments",
+    "part_number": "MSP430G2553",
+    "package": "TSSOP-20 / TSSOP-28 / QFN-32 (whichever package you have)",
+    "logo_hint": "TEXA",
+    "patterns": {
+      "part_code": "\\bMSP430G2553\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  },
+  {
+    "part_id": "at24c08a",
+    "oem": "Microchip / Atmel",
+    "part_number": "AT24C08A",
+    "package": "SOIC-8 / PDIP-8 / TSSOP-8 / SOT-23-5",
+    "logo_hint": "MICR",
+    "patterns": {
+      "part_code": "\\bAT24C08A\\b",
+      "date_code": "\\b[0-9]{2}[0-5][0-9]\\b",
+      "lot_code": "\\b[0-9A-Z]{3,6}\\b"
+    }
+  }
+]

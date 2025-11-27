@@ -1,0 +1,57 @@
+# =========================================
+#  PYTHON (Backend)
+# =========================================
+
+backend/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyd
+
+# Virtual environments
+backend/.venv/
+backend/env/
+backend/venv/
+
+# Environment files
+backend/.env
+backend/.env.*
+
+# Build artifacts
+backend/build/
+backend/dist/
+backend/wheels/
+backend/*.egg-info
+
+# Logs
+backend/*.log
+
+# YOLO model weights
+backend/**/*.pt
+backend/**/*.onnx
+backend/**/*.engine
+backend/**/*.mlmodel
+
+# Temporary / cache
+backend/*.tmp
+backend/*.swp
+backend/*.bak
+backend/.reload/
+
+
+# =========================================
+#  NODE / FRONTEND (Future)
+# =========================================
+
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+
+
+# =========================================
+#  GLOBAL IGNORE (Applies everywhere)
+# =========================================
+
+.DS_Store
+Thumbs.db
+.vscode/
