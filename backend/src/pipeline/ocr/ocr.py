@@ -1,5 +1,5 @@
 """
-OCR Module - Multi-Pass Tesseract Text Extraction
+OCR Module - Enhanced Multi-Pass Tesseract Text Extraction
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
 Mentor: Zoe 💙
@@ -16,49 +16,66 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 def preprocess(img: np.ndarray, use_adaptive: bool = True) -> np.ndarray:
     """
-    Preprocess image for optimal OCR results
+    Enhanced preprocessing for IC chip OCR
     
-    Args:
-        img: Input image (BGR format from OpenCV)
-        use_adaptive: Use adaptive thresholding if True, else Otsu
+    Optimized for:
+    - Laser-etched text
+    - Low contrast markings
+    - Multi-line text
+    - Industrial IC images
     
-    Returns:
-        Preprocessed binary image ready for Tesseract
-    
-    Note for Saif:
-        This improves OCR accuracy on IC markings significantly
+    Author: Saif (CommitSaif11)
+    Mentor: Zoe 💙
     """
     # Convert BGR to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    # Apply bilateral filter to reduce noise while preserving edges
-    # This helps with IC marking text clarity
-    filtered = cv2.bilateralFilter(gray, 9, 75, 75)
+    # Step 1: CLAHE (Contrast Limited Adaptive Histogram Equalization)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    enhanced = clahe.apply(gray)
     
-    # Normalize intensity to improve contrast
-    # This handles varying lighting conditions in industrial settings
-    normalized = cv2. normalize(filtered, None, 0, 255, cv2. NORM_MINMAX)
+    # Step 2: Mild denoising
+    denoised = cv2. fastNlMeansDenoising(enhanced, None, h=10, templateWindowSize=7, searchWindowSize=21)
     
-    # Apply thresholding based on Saif's preference
+    # Step 3: Sharpening
+    gaussian = cv2.GaussianBlur(denoised, (0, 0), 2.0)
+    sharpened = cv2.addWeighted(denoised, 1.5, gaussian, -0.5, 0)
+    
+    # Step 4: Morphological cleanup
+    kernel = cv2.getStructuringElement(cv2. MORPH_RECT, (2, 2))
+    morph = cv2.morphologyEx(sharpened, cv2. MORPH_CLOSE, kernel)
+    
+    # Step 5: Thresholding
     if use_adaptive:
-        # Adaptive thresholding works better for uneven lighting
-        # Common in factory floor camera setups
         binary = cv2.adaptiveThreshold(
-            normalized,
+            morph,
             255,
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2. ADAPTIVE_THRESH_GAUSSIAN_C,
             cv2. THRESH_BINARY,
-            11,  # Block size
-            2    # Constant subtracted from mean
+            25,
+            10
         )
     else:
-        # Otsu's thresholding for uniform lighting conditions
         _, binary = cv2.threshold(
-            normalized,
+            morph,
             0,
             255,
-            cv2. THRESH_BINARY + cv2.THRESH_OTSU
+            cv2. THRESH_BINARY + cv2. THRESH_OTSU
         )
+    
+    # Step 6: Auto-invert if needed
+    white_pixels = np.sum(binary == 255)
+    black_pixels = np.sum(binary == 0)
+    
+    if black_pixels > white_pixels:
+        binary = cv2.bitwise_not(binary)
+    
+    # Step 7: Remove tiny noise
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(binary, connectivity=8)
+    for i in range(1, num_labels):
+        area = stats[i, cv2.CC_STAT_AREA]
+        if area < 10:
+            binary[labels == i] = 0
     
     return binary
 
@@ -68,38 +85,22 @@ def run_ocr_single_pass(
     psm: int, 
     whitelist: str
 ) -> Tuple[str, float]:
-    """
-    Run single-pass Tesseract OCR with specific whitelist
-    
-    Args:
-        img: Preprocessed binary image
-        psm: Page Segmentation Mode
-        whitelist: Character whitelist for this pass
-    
-    Returns:
-        Tuple of (extracted_text, average_confidence)
-    """
-    # Configure Tesseract with Saif's specified parameters
+    """Run single-pass Tesseract OCR"""
     custom_config = f"--oem 3 --psm {psm} -c tessedit_char_whitelist={whitelist}"
     
-    # Run Tesseract OCR and get detailed output data
     data = pytesseract.image_to_data(
         img,
         config=custom_config,
         output_type=pytesseract. Output.DICT
     )
     
-    # Parse the OCR output for Saif
     extracted_text = parse_ocr_output(data)
     
-    # Calculate average confidence from valid detections
     confidences = []
     for i, conf in enumerate(data['conf']):
-        # Filter out invalid confidence values (-1 means no detection)
-        if conf != -1 and data['text'][i]. strip():
+        if conf != -1 and data['text'][i].strip():
             confidences.append(float(conf))
     
-    # Compute average confidence normalized to 0. 0-1.0 range
     if confidences:
         avg_conf = sum(confidences) / len(confidences) / 100.0
     else:
@@ -110,121 +111,56 @@ def run_ocr_single_pass(
 
 def run_ocr_multi_pass(
     img: np.ndarray,
-    psm: int = 6
+    psm: int = 11  # Changed to PSM 11 for IC chips
 ) -> Dict[str, Dict[str, any]]:
     """
-    Run multi-pass OCR with field-specific whitelists (OPTION B)
+    Run multi-pass OCR with dual thresholding
     
-    This is Saif's chosen approach for maximum accuracy! 
-    
-    Args:
-        img: Preprocessed binary image (full IC marking area)
-        psm: Page Segmentation Mode (6=uniform block, 7=single line)
-    
-    Returns:
-        Dictionary containing results from all passes:
-        {
-            "full_alphanumeric": {
-                "text": "STM32F030C8T6 2347 A3B5C",
-                "confidence": 0. 87
-            },
-            "numeric_only": {
-                "text": "2347",
-                "confidence": 0.92
-            },
-            "alpha_only": {
-                "text": "STMFCT ABC",
-                "confidence": 0.78
-            }
-        }
-    
-    Note for Saif:
-        Each pass uses a different character whitelist for better accuracy
+    PSM 11 = Sparse text (best for IC markings)
     """
     results = {}
     
-    # Pass 1: Full alphanumeric (for part codes and lot codes)
-    text_alphanum, conf_alphanum = run_ocr_single_pass(
-        img,
-        psm=psm,
-        whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    )
-    results["full_alphanumeric"] = {
-        "text": text_alphanum,
-        "confidence": conf_alphanum
-    }
+    # Preprocess with both methods
+    binary_adaptive = preprocess(img, use_adaptive=True)
+    binary_otsu = preprocess(img, use_adaptive=False)
     
-    # Pass 2: Numeric only (for date codes - prevents letter misreads)
-    text_numeric, conf_numeric = run_ocr_single_pass(
-        img,
-        psm=psm,
-        whitelist="0123456789"
-    )
-    results["numeric_only"] = {
-        "text": text_numeric,
-        "confidence": conf_numeric
-    }
+    # Pass 1: Full alphanumeric (try both, pick best)
+    text_adp, conf_adp = run_ocr_single_pass(binary_adaptive, psm=psm, whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    text_otsu, conf_otsu = run_ocr_single_pass(binary_otsu, psm=psm, whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
     
-    # Pass 3: Alpha only (for logo hints and OEM names)
-    text_alpha, conf_alpha = run_ocr_single_pass(
-        img,
-        psm=psm,
-        whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    )
-    results["alpha_only"] = {
-        "text": text_alpha,
-        "confidence": conf_alpha
-    }
+    if conf_adp > conf_otsu:
+        results["full_alphanumeric"] = {"text": text_adp, "confidence": conf_adp}
+    else:
+        results["full_alphanumeric"] = {"text": text_otsu, "confidence": conf_otsu}
+    
+    # Pass 2: Numeric only
+    text_num, conf_num = run_ocr_single_pass(binary_adaptive, psm=psm, whitelist="0123456789")
+    results["numeric_only"] = {"text": text_num, "confidence": conf_num}
+    
+    # Pass 3: Alpha only
+    text_alpha, conf_alpha = run_ocr_single_pass(binary_adaptive, psm=psm, whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    results["alpha_only"] = {"text": text_alpha, "confidence": conf_alpha}
     
     return results
 
 
 def run_ocr(
     img: np.ndarray, 
-    psm: int = 6, 
+    psm: int = 11,  # Changed default
     whitelist: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 ) -> Tuple[str, float]:
-    """
-    Main OCR function (backward compatible with single-pass mode)
-    
-    Args:
-        img: Preprocessed binary image
-        psm: Page Segmentation Mode
-        whitelist: Character whitelist (for single-pass mode)
-    
-    Returns:
-        Tuple of (extracted_text, average_confidence)
-    
-    Note for Saif:
-        This is kept for backward compatibility. 
-        Use run_ocr_multi_pass() for better accuracy! 
-    """
-    return run_ocr_single_pass(img, psm, whitelist)
+    """Backward compatible single-pass OCR"""
+    binary = preprocess(img, use_adaptive=True)
+    return run_ocr_single_pass(binary, psm, whitelist)
 
 
 def parse_ocr_output(data: dict) -> str:
-    """
-    Parse Tesseract output data and clean extracted text
-    
-    Args:
-        data: Dictionary from pytesseract.image_to_data
-    
-    Returns:
-        Cleaned and formatted text string
-    
-    Note for Saif:
-        Removes noise and combines words properly for IC marking verification
-    """
-    # Extract all valid text words
+    """Parse and clean Tesseract output"""
     words = []
     for i, text in enumerate(data['text']):
-        # Remove empty strings and whitespace-only entries
         cleaned = text.strip()
         if cleaned:
-            # Convert to uppercase for consistent matching
-            words.append(cleaned.upper())
+            words.append(cleaned. upper())
     
-    # Combine words with single space separator
     final_text = " ".join(words)
-    
     return final_text
