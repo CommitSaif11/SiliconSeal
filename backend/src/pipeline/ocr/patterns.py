@@ -84,7 +84,7 @@ def matches_known_pattern(text: str) -> Tuple[bool, Optional[str]]:
         >>> matches_known_pattern("UNKNOWN123")
         (False, None)
     """
-    text_clean = text.strip(). upper(). replace(" ", "")
+    text_clean = text.strip().upper().replace(" ", "")
     
     for pattern_name, regex in IC_PATTERNS.items():
         if re.match(regex, text_clean, re.IGNORECASE):
@@ -133,7 +133,7 @@ def is_valid_part_code_format(text: str, min_length: int = 6) -> bool:
     
     # Must contain both letters and numbers
     has_letter = any(c.isalpha() for c in text_clean)
-    has_number = any(c. isdigit() for c in text_clean)
+    has_number = any(c.isdigit() for c in text_clean)
     
     if not (has_letter and has_number):
         return False
