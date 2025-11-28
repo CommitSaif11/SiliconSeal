@@ -40,21 +40,16 @@ async def _run_detector_get_crops(image: "np.ndarray") -> List[Any]:
     Detector module expected (if present): pipeline.detector.yolo_detector with a function detect or detect_crops.
     """
     try:
-        # dynamic import to avoid hard dependency
         from pipeline.detector import yolo_detector as yolo
-        # Try common function names
         if hasattr(yolo, "detect_crops"):
             crops = yolo.detect_crops(image)
         elif hasattr(yolo, "detect"):
-            # some implementations return list of cropped images or bboxes
             result = yolo.detect(image)
-            # If detect returns list of images, use that; otherwise attempt to extract crops if result has 'crops'
             if isinstance(result, list):
                 crops = result
             elif isinstance(result, dict) and "crops" in result:
                 crops = result["crops"]
             else:
-                # fallback: use full image
                 crops = [image]
         else:
             logger.warning("Detector found but no known detect function; using full image as crop")
@@ -64,7 +59,6 @@ async def _run_detector_get_crops(image: "np.ndarray") -> List[Any]:
         return crops
     except Exception as e:
         logger.debug(f"No detector available or detector failed: {e}")
-        # fallback to whole image
         return [image]
 
 
@@ -91,40 +85,31 @@ async def process_single_image(
     """
     global kb_index
 
-    # 1. Decode image
     try:
         img = decode_image(image_bytes)
     except Exception as e:
         raise ValueError(f"Failed to decode uploaded image: {e}")
 
-    # 2. Resize if too large
     img = resize_image_max(img, max_dim=resize_max)
 
-    # 3. Detection -> crops
     crops = await _run_detector_get_crops(img)
-    # Prefer first crop (primary IC). If crops are not numpy images, try to handle gracefully.
     primary_crop = crops[0] if crops else img
 
-    # 4. OCR (multi-pass)
     try:
         ocr_results = run_ocr_multi_pass(primary_crop)
     except Exception as e:
-        # OCR is synchronous; wrap in thread if heavy — currently call directly
         logger.exception("OCR failed:", exc_info=e)
         raise
 
-    # 5. Verification
     try:
         if algorithm == "regex" and part_id:
             verification = verify_with_regex(ocr_results, part_id, kb_index)
         else:
-            # default to Aho auto-detection
             verification = verify_with_aho(ocr_results, part_id, kb_index)
     except Exception as e:
         logger.exception("Verification failed", exc_info=e)
         raise
 
-    # Build response dict (lightweight conversion from VerificationResult dataclass)
     response = {
         "status": "success",
         "verdict": verification.verdict,
@@ -138,7 +123,6 @@ async def process_single_image(
         "candidate_parts": verification.candidate_parts or [],
     }
 
-    # 6. Log to DB if provided
     try:
         if db is not None:
             log_doc = {
@@ -176,7 +160,6 @@ async def process_batch_images(
     """
     Process multiple uploaded files in parallel and return list of responses.
     """
-    # Read files concurrently
     loop = asyncio.get_event_loop()
 
     async def _process_upload(file: UploadFile):

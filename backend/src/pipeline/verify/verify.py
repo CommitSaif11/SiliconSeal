@@ -23,7 +23,7 @@ def verify_with_regex(
     Use when: Operator knows which IC is being scanned
     
     Args:
-        ocr_results: Multi-pass OCR results from ocr. run_ocr_multi_pass()
+        ocr_results: Multi-pass OCR results from ocr.run_ocr_multi_pass()
         part_id: User-specified IC part identifier
         kb_index: Loaded KB index
     

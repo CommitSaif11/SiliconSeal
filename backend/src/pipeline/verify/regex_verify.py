@@ -10,7 +10,7 @@ import re
 from typing import Dict, Optional, Any
 from engine.kb_index import KBIndex, CompiledPatterns
 from engine.kb_loader import KBEntry
-from . scoring import (
+from .scoring import (
     VerificationResult,
     validate_date_code,
     calculate_verdict,
@@ -93,8 +93,8 @@ def verify_with_regex_logic(
         VerificationResult with verdict and details
     
     Workflow for Saif:
-        1.  Normalize and correct OCR text
-        2.  Get compiled patterns for part_id
+        1. Normalize and correct OCR text
+        2. Get compiled patterns for part_id
         3. Extract fields using regex
         4. Calculate verdict with weighted scoring
     """
@@ -116,7 +116,7 @@ def verify_with_regex_logic(
     # Normalize OCR texts (Saif's split-text fix)
     alphanum_text = normalize_ocr_text(ocr_results["full_alphanumeric"]["text"])
     
-    # Correct OCR confusions (automatic as per Saif's decision)
+    # Correct OCR confusions
     numeric_text = correct_ocr_confusion(
         ocr_results["numeric_only"]["text"],
         context="numeric"
@@ -148,7 +148,7 @@ def verify_with_regex_logic(
         ocr_results["numeric_only"]["confidence"]
     ) / 2.0
     
-    # Calculate verdict (with Saif's weighted scoring)
+    # Calculate verdict
     verdict, confidence, flags = calculate_verdict(
         matches=matches,
         ocr_confidence=avg_ocr_conf,
@@ -172,5 +172,5 @@ def verify_with_regex_logic(
         extracted_fields=extracted_fields,
         oem_info=oem_info,
         flags=flags,
-        weighted_score=None  # Will be added in scoring
+        weighted_score=None
     )
