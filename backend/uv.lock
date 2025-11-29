@@ -262,7 +262,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "litellm", specifier = ">=1.80.0" },
     { name = "motor", specifier = ">=3.7.1" },
-    { name = "numpy", specifier = ">=2.2.6" },
+    { name = "numpy", specifier = ">=1.26.4" },
     { name = "opencv-python-headless", specifier = ">=4.11.0.86" },
     { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
     { name = "pdfminer-six", specifier = ">=20251107" },

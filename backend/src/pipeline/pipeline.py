@@ -5,6 +5,8 @@ import logging
 from typing import Optional, List, Dict, Any
 from fastapi import UploadFile
 import numpy as np
+from datetime import datetime, timezone
+
 from core import get_database
 from core.config import settings
 
@@ -27,10 +29,14 @@ async def initialize_pipeline():
     try:
         from engine.kb_index import load_kb_index
         kb_index = load_kb_index()
-        logger.info(f"Pipeline: KB index loaded (entries={len(kb_index.entries) if hasattr(kb_index, 'entries') else 'unknown'})")
+        logger.info(
+            f"Pipeline: KB index loaded (entries={len(kb_index.entries) if hasattr(kb_index, 'entries') else 'unknown'})"
+        )
     except Exception as e:
         kb_index = None
-        logger.warning(f"Pipeline: Could not load KB index at startup: {e}. Pipeline will still run but auto-detection may be limited.")
+        logger.warning(
+            f"Pipeline: Could not load KB index at startup: {e}. Pipeline will still run but auto-detection may be limited."
+        )
 
 
 async def _run_detector_get_crops(image: "np.ndarray") -> List[Any]:
@@ -66,6 +72,7 @@ async def process_single_image(
     image_bytes: bytes,
     part_id: Optional[str],
     algorithm: str = "aho_corasick",
+    enable_preprocessing: bool = False,  # ← Kept for API compatibility (Saif's decision 💙)
     db = None,
     resize_max: int = 1600
 ) -> Dict[str, Any]:
@@ -81,7 +88,17 @@ async def process_single_image(
       6. Log result to MongoDB (if db provided)
       7. Return dict matching VerificationResponse schema
 
-    Note: kb_index is used by verification modules; it's loaded in initialize_pipeline() if available.
+    Args:
+        image_bytes: Raw image bytes
+        part_id: Optional part ID for verification
+        algorithm: "regex" or "aho_corasick"
+        enable_preprocessing: Kept for API compatibility (currently unused - empirical testing showed raw images work best)
+        db: MongoDB database instance
+        resize_max: Maximum image dimension for resizing
+
+    Note for Saif:
+        - OCR uses raw images by default (Saif's working implementation)
+        - kb_index is used by verification modules; loaded in initialize_pipeline() if available
     """
     global kb_index
 
@@ -95,12 +112,14 @@ async def process_single_image(
     crops = await _run_detector_get_crops(img)
     primary_crop = crops[0] if crops else img
 
+    # Run Saif's OCR (no preprocessing parameter - it's handled internally)
     try:
-        ocr_results = run_ocr_multi_pass(primary_crop)
+        ocr_results = run_ocr_multi_pass(primary_crop, enable_preprocessing=enable_preprocessing)
     except Exception as e:
         logger.exception("OCR failed:", exc_info=e)
         raise
 
+    # Verify using Saif's OCR structure
     try:
         if algorithm == "regex" and part_id:
             verification = verify_with_regex(ocr_results, part_id, kb_index)
@@ -121,21 +140,23 @@ async def process_single_image(
         "flags": verification.flags or [],
         "requires_admin_review": verification.requires_admin_review,
         "candidate_parts": verification.candidate_parts or [],
+        "preprocessing_applied": enable_preprocessing,  # Always False with Saif's OCR
     }
 
+    # DB logging with Saif's OCR structure
     try:
         if db is not None:
+            full_text = ocr_results.get("full_text", "")
+            rec_scores = ocr_results.get("rec_scores", [])
+            avg_confidence = sum(rec_scores) / len(rec_scores) if rec_scores else 0.0
+
             log_doc = {
-                "timestamp": __import__("datetime").datetime.utcnow(),
+                "timestamp": datetime.now(timezone.utc),
                 "part_id": part_id,
                 "algorithm_used": response["algorithm_used"],
-                "ocr_text": " ".join([
-                    ocr_results.get("full_alphanumeric", {}).get("text", ""),
-                    ocr_results.get("numeric_only", {}).get("text", ""),
-                    ocr_results.get("alpha_only", {}).get("text", "")
-                ]).strip(),
-                "ocr_confidence": float((ocr_results.get("full_alphanumeric", {}).get("confidence", 0.0) +
-                                         ocr_results.get("numeric_only", {}).get("confidence", 0.0)) / 2.0),
+                "preprocessing_applied": enable_preprocessing,
+                "ocr_text": full_text,
+                "ocr_confidence": float(avg_confidence),
                 "verdict": response["verdict"],
                 "confidence_score": response["confidence_score"],
                 "matches": response["matches"],
@@ -155,6 +176,7 @@ async def process_batch_images(
     files: List[UploadFile],
     part_id: Optional[str],
     algorithm: str,
+    enable_preprocessing: bool = False,  # ← Kept for API compatibility (Saif's decision 💙)
     db = None
 ) -> List[Dict[str, Any]]:
     """
@@ -164,7 +186,13 @@ async def process_batch_images(
 
     async def _process_upload(file: UploadFile):
         content = await file.read()
-        return await process_single_image(content, part_id, algorithm, db)
+        return await process_single_image(
+            content,
+            part_id,
+            algorithm,
+            enable_preprocessing=enable_preprocessing,
+            db=db
+        )
 
     tasks = [_process_upload(f) for f in files]
     results = await asyncio.gather(*tasks, return_exceptions=False)

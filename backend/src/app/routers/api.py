@@ -54,7 +54,6 @@ async def health_check():
     Health check endpoint for FastAPI + MongoDB status.
     Shown on dashboard & used by frontend for initial boot status.
     """
-
     try:
         db = await get_database()
         await db.command("ping")
@@ -84,17 +83,14 @@ async def get_parts_list():
     - Used for dropdown in frontend.
     - Does NOT expose OEM patterns (admin-only).
     """
-
     try:
         kb_data = load_raw_kb()
         part_ids = [entry["part_id"] for entry in kb_data]
-
         return {
             "status": "success",
             "count": len(part_ids),
             "parts": part_ids
         }
-
     except Exception as e:
         raise HTTPException(500, f"Failed to fetch parts: {str(e)}")
 
@@ -106,24 +102,38 @@ async def get_parts_list():
 async def scan_image(
     file: UploadFile = File(...),
     part_id: Optional[str] = Form(None),        # Optional → auto-detect mode supported
-    algorithm: str = Form("aho_corasick"),      # “regex” or “aho_corasick”
+    algorithm: str = Form("aho_corasick"),      # "regex" or "aho_corasick"
+    enable_preprocessing: bool = Form(False),   # ← NEW: OCR preprocessing toggle 💙
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """
     Performs the FULL pipeline on one uploaded image.
     Calls process_single_image() → YOLO → OCR → VERIFY → DB log.
+    
+    Args:
+        file: Uploaded image file
+        part_id: Optional part ID (auto-detect if None)
+        algorithm: Verification algorithm ("regex" or "aho_corasick")
+        enable_preprocessing: Apply OCR preprocessing (default: False)
+        db: MongoDB database instance
+    
+    Returns:
+        Complete verification result with OCR data, YOLO detection, and verification status
+    
+    Note for Saif:
+        - enable_preprocessing=False (default): Raw image OCR - best for high-quality IC images
+        - enable_preprocessing=True: Minimal preprocessing - may help low-quality images
     """
-
     try:
         image_bytes = await file.read()
         result = await process_single_image(
             image_bytes=image_bytes,
             part_id=part_id,
             algorithm=algorithm,
+            enable_preprocessing=enable_preprocessing,
             db=db
         )
         return result
-
     except Exception as e:
         raise HTTPException(500, f"Scan processing failed: {str(e)}")
 
@@ -136,23 +146,37 @@ async def scan_frame(
     frame: str = Form(...),                     # Base64 string
     part_id: Optional[str] = Form(None),
     algorithm: str = Form("aho_corasick"),
+    enable_preprocessing: bool = Form(False),   # ← NEW: OCR preprocessing toggle 💙
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """
     Used for continuous live-camera mode (webcam, mobile camera streaming).
-    Base64 → decoded → pipeline.
+    Base64 → decoded → pipeline. 
+    
+    Args:
+        frame: Base64-encoded image string
+        part_id: Optional part ID (auto-detect if None)
+        algorithm: Verification algorithm ("regex" or "aho_corasick")
+        enable_preprocessing: Apply OCR preprocessing (default: False)
+        db: MongoDB database instance
+    
+    Returns:
+        Complete verification result
+    
+    Note for Saif:
+        - enable_preprocessing=False (default): Raw image OCR - recommended
+        - enable_preprocessing=True: Minimal preprocessing for low-quality frames
     """
-
     try:
         image_bytes = base64.b64decode(frame)
         result = await process_single_image(
             image_bytes=image_bytes,
             part_id=part_id,
             algorithm=algorithm,
+            enable_preprocessing=enable_preprocessing,
             db=db
         )
         return result
-
     except Exception as e:
         raise HTTPException(500, f"Frame processing failed: {str(e)}")
 
@@ -165,25 +189,38 @@ async def scan_batch(
     files: List[UploadFile] = File(...),
     part_id: str = Form(...),
     algorithm: str = Form("regex"),             # Batch mode defaults to regex
+    enable_preprocessing: bool = Form(False),   # ← NEW: OCR preprocessing toggle 💙
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """
     Batch verification. Processes multiple uploads in parallel.
+    
+    Args:
+        files: List of uploaded image files
+        part_id: Part ID to verify against
+        algorithm: Verification algorithm ("regex" or "aho_corasick")
+        enable_preprocessing: Apply OCR preprocessing (default: False)
+        db: MongoDB database instance
+    
+    Returns:
+        Batch results with individual verification statuses
+    
+    Note for Saif:
+        - enable_preprocessing=False (default): Raw image OCR for all images
+        - enable_preprocessing=True: Applies preprocessing to all batch images
     """
-
     try:
         results = await process_batch_images(
             files=files,
             part_id=part_id,
             algorithm=algorithm,
+            enable_preprocessing=enable_preprocessing,
             db=db
         )
-
         return {
             "status": "success",
             "results": results
         }
-
     except Exception as e:
         raise HTTPException(500, f"Batch processing failed: {str(e)}")
 
@@ -197,7 +234,6 @@ async def get_kb_list():
     ADMIN ONLY — Show full KB entries (includes regex / metadata)
     🚨 AUTH WILL BE ADDED LATER using JWT.
     """
-
     try:
         kb_data = load_raw_kb()
         return {
@@ -218,24 +254,18 @@ async def get_kb_entry(part_id: str):
     """
     ADMIN ONLY — Fetch full KB record for a single part.
     """
-
     try:
         kb_data = load_raw_kb()
         kb_entry = next((i for i in kb_data if i["part_id"] == part_id), None)
-
         if kb_entry is None:
             raise HTTPException(404, f"KB entry not found: {part_id}")
-
-        # Validate structure for safety (must match KB schema)
         validate_entry(kb_entry)
-
         return {
             "status": "success",
             "access": "admin",
             "part_id": part_id,
             "data": kb_entry
         }
-
     except HTTPException:
         raise
     except Exception as e:
@@ -251,7 +281,6 @@ async def reload_knowledge_base():
     Reload KB from disk. Useful during development.
     In future: This will trigger rebuilding Aho-Corasick automaton.
     """
-
     try:
         kb_data = load_raw_kb()
         return {
@@ -259,6 +288,5 @@ async def reload_knowledge_base():
             "message": "KB reload successful",
             "count": len(kb_data)
         }
-
     except Exception as e:
         raise HTTPException(500, f"Failed to reload KB: {str(e)}")
