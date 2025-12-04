@@ -8,10 +8,10 @@
     "patterns": {
       "part_code": "\\bSTM\\s*32\\s*F\\s*0\\s*30\\s*C\\s*8\\s*T\\s*6\\b|\\bSTM32F030C8T6\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
-   {
+  {
     "part_id": "stm32f407zet6",
     "oem": "STMicroelectronics",
     "part_number": "STM32F407ZET6",
@@ -32,7 +32,7 @@
     "patterns": {
       "part_code": "\\bW\\s*25\\s*Q\\s*64\\s*J\\s*V\\s*S\\s*1\\s*Q\\b|\\bW25Q64JVS1Q\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -44,7 +44,7 @@
     "patterns": {
       "part_code": "\\bI\\s*N\\s*A\\s*2\\s*1\\s*9\\b|\\bINA219\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -56,7 +56,7 @@
     "patterns": {
       "part_code": "\\bA\\s*D\\s*S\\s*1\\s*1\\s*1\\s*3\\b|\\bADS1113\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -68,7 +68,7 @@
     "patterns": {
       "part_code": "\\bM\\s*C\\s*P\\s*6\\s*0\\s*0\\s*1\\b|\\bMCP6001\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -80,7 +80,7 @@
     "patterns": {
       "part_code": "\\bL\\s*M\\s*3\\s*5\\s*8\\b|\\bLM358\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -92,7 +92,7 @@
     "patterns": {
       "part_code": "\\bS\\s*N\\s*7\\s*4\\s*L\\s*V\\s*C\\s*1\\s*G\\s*0\\s*4\\b|\\bSN74LVC1G04\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -104,7 +104,7 @@
     "patterns": {
       "part_code": "\\b(7\\s*4\\s*H\\s*C\\s*1\\s*4|7\\s*4\\s*H\\s*C\\s*T\\s*1\\s*4)\\b|\\b(74HC14|74HCT14)\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -116,7 +116,7 @@
     "patterns": {
       "part_code": "\\bS\\s*N\\s*7\\s*4\\s*H\\s*C\\s*5\\s*9\\s*5\\b|\\bSN74HC595\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -128,7 +128,7 @@
     "patterns": {
       "part_code": "\\bL\\s*M\\s*2\\s*5\\s*9\\s*6\\b|\\bLM2596\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -140,7 +140,7 @@
     "patterns": {
       "part_code": "\\bT\\s*P\\s*S\\s*5\\s*4\\s*3\\s*0\\b|\\bTPS5430\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -152,7 +152,7 @@
     "patterns": {
       "part_code": "\\bA\\s*M\\s*S\\s*1\\s*1\\s*1\\s*7\\b|\\bAMS1117\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -164,7 +164,7 @@
     "patterns": {
       "part_code": "\\bL\\s*M\\s*1\\s*1\\s*1\\s*7\\b|\\bLM1117\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -176,7 +176,7 @@
     "patterns": {
       "part_code": "\\b(A\\s*T\\s*2\\s*4\\s*C\\s*0\\s*4\\s*C|A\\s*T\\s*2\\s*4\\s*C\\s*0\\s*8\\s*C)\\b|\\b(AT24C04C|AT24C08C)\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -188,7 +188,7 @@
     "patterns": {
       "part_code": "\\bM\\s*S\\s*P\\s*4\\s*3\\s*0\\s*G\\s*2\\s*5\\s*5\\s*3\\b|\\bMSP430G2553\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -200,7 +200,7 @@
     "patterns": {
       "part_code": "\\bA\\s*T\\s*2\\s*4\\s*C\\s*0\\s*8\\s*A\\b|\\bAT24C08A\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{3,8}\\b"
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   }
 ]

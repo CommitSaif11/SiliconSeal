@@ -87,18 +87,6 @@ async def process_single_image(
       5. Verification (regex or aho)
       6. Log result to MongoDB (if db provided)
       7. Return dict matching VerificationResponse schema
-
-    Args:
-        image_bytes: Raw image bytes
-        part_id: Optional part ID for verification
-        algorithm: "regex" or "aho_corasick"
-        enable_preprocessing: Kept for API compatibility (currently unused - empirical testing showed raw images work best)
-        db: MongoDB database instance
-        resize_max: Maximum image dimension for resizing
-
-    Note for Saif:
-        - OCR uses raw images by default (Saif's working implementation)
-        - kb_index is used by verification modules; loaded in initialize_pipeline() if available
     """
     global kb_index
 
@@ -115,6 +103,11 @@ async def process_single_image(
     # Run Saif's OCR (no preprocessing parameter - it's handled internally)
     try:
         ocr_results = run_ocr_multi_pass(primary_crop, enable_preprocessing=enable_preprocessing)
+        # DEBUG: log the exact alphanumeric text and cleaned text
+        full_text = ocr_results.get('full_alphanumeric', {}).get('text', '')
+        logger.info(f"[OCR] full_alphanumeric.text='{full_text}'")
+        cleaned = ''.join(c for c in full_text if c.isalnum())
+        logger.info(f"[OCR] full_alphanumeric.cleaned='{cleaned}'")
     except Exception as e:
         logger.exception("OCR failed:", exc_info=e)
         raise
@@ -182,8 +175,6 @@ async def process_batch_images(
     """
     Process multiple uploaded files in parallel and return list of responses.
     """
-    loop = asyncio.get_event_loop()
-
     async def _process_upload(file: UploadFile):
         content = await file.read()
         return await process_single_image(
