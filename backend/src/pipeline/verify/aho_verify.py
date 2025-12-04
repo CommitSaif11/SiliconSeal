@@ -8,7 +8,7 @@ Mentor: Zoe 💙
 
 from typing import Dict, Set, List, Optional, Any, Tuple
 from engine.kb_index import KBIndex
-from . scoring import (
+from .scoring import (
     VerificationResult,
     normalize_ocr_text,
     correct_ocr_confusion,
@@ -44,11 +44,11 @@ def find_candidate_parts(
     combined_text = f"{alphanum_text} {alpha_text}"
     
     # Run Aho-Corasick token search
-    token_hits = kb_index. aho_search(combined_text)
+    token_hits = kb_index.aho_search(combined_text)
     
     # Collect candidate part IDs
     candidates = set()
-    for token, part_ids in token_hits. items():
+    for token, part_ids in token_hits.items():
         # Apply Saif's minimum token length filter
         # Exception: Logo hints can be 4 chars
         if len(token) >= min_token_length or len(token) >= 4:
@@ -107,10 +107,10 @@ def filter_weak_candidates(
         
         # Require at least one of:
         # 1. Part code match (strongest evidence)
-        # 2.  Logo + Date + Lot combined
+        # 2. Logo + Date + Lot combined
         # 3. Date + Lot (marginal but acceptable)
         
-        if matches. get("part_code_match", False):
+        if matches.get("part_code_match", False):
             # Strong evidence - keep
             strong_candidates.append((part_id, result, score))
         
@@ -146,7 +146,7 @@ def verify_with_aho_logic(
         VerificationResult with auto-detected part or multiple candidates
     
     Workflow for Saif:
-        1.  Find candidate parts via Aho-Corasick token search
+        1. Find candidate parts via Aho-Corasick token search
         2. If user_part_id provided, verify it's in candidates
         3. Score all candidates using regex verification
         4. Filter weak evidence candidates
@@ -200,7 +200,7 @@ def verify_with_aho_logic(
         )
     
     # Step 5: Sort by weighted score (descending)
-    strong_candidates. sort(key=lambda x: x[2], reverse=True)
+    strong_candidates.sort(key=lambda x: x[2], reverse=True)
     
     best_part_id, best_result, best_score = strong_candidates[0]
     
@@ -223,7 +223,7 @@ def verify_with_aho_logic(
                 verdict="MULTIPLE_CANDIDATES",
                 confidence_score=0.0,
                 algorithm_used="aho_corasick",
-                flags=["AMBIGUOUS_MATCH", f"SCORE_DIFF_{score_diff:. 2f}"],
+                flags=["AMBIGUOUS_MATCH", f"SCORE_DIFF_{score_diff:.2f}"],
                 matches=best_result.matches,
                 extracted_fields=best_result.extracted_fields,
                 oem_info={},

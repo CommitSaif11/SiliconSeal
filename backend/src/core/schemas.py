@@ -6,7 +6,7 @@ Author: Saif (CommitSaif11)
 Mentor: Zoe 💙
 """
 
-from datetime import datetime
+from datetime import datetime, timezone  # UPDATED
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, validator
 
@@ -73,27 +73,17 @@ class VerificationResponse(BaseModel):
         Standardized output for all verification endpoints
     """
     status: str = "success"
-    verdict: str = Field(... , description="GENUINE, FAKE, UNCERTAIN, MULTIPLE_CANDIDATES")
-    confidence_score: float = Field(... , ge=0.0, le=1.0)
-    
-    # Match details
+    verdict: str = Field(..., description="GENUINE, FAKE, UNCERTAIN, MULTIPLE_CANDIDATES")
+    confidence_score: float = Field(..., ge=0.0, le=1.0)
     matches: Dict[str, bool]
     extracted_fields: Dict[str, Any]
-    
-    # OEM info
     oem_info: Optional[Dict[str, str]] = None
-    
-    # Metadata
     algorithm_used: str
     flags: List[str] = []
     requires_admin_review: bool = False
-    
-    # Candidates (for aho_corasick)
     candidate_parts: Optional[List[Dict[str, Any]]] = None
-    
-    # Processing metadata
     processing_time_ms: Optional[float] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # CHANGED
     
     class Config:
         json_schema_extra = {
@@ -166,4 +156,4 @@ class ErrorResponse(BaseModel):
     status: str = "error"
     error: str
     detail: Optional[str] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # CHANGED

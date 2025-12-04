@@ -30,7 +30,7 @@ class VerificationResult:
     Standardized verification output for Saif's API endpoints
     """
     verdict: str  # "GENUINE", "FAKE", "UNCERTAIN", "MULTIPLE_CANDIDATES"
-    confidence_score: float  # 0. 0 to 1.0
+    confidence_score: float  # 0.0 to 1.0
     algorithm_used: str  # "regex" or "aho_corasick"
     
     matches: Dict[str, bool] = field(default_factory=dict)
@@ -75,7 +75,7 @@ def validate_date_code(date_code: str) -> Dict[str, Any]:
     full_year = 2000 + year_part
     
     # Get current date info
-    now = datetime.datetime. now()
+    now = datetime.datetime.now()
     current_year = now.year
     current_week = now.isocalendar()[1]
     
@@ -83,7 +83,7 @@ def validate_date_code(date_code: str) -> Dict[str, Any]:
     
     # Critical Check 1: Future date (instant FAKE as per Saif's requirement)
     if full_year > current_year:
-        flags. append("FUTURE_YEAR")
+        flags.append("FUTURE_YEAR")
     elif full_year == current_year and week_part > current_week:
         flags.append("FUTURE_WEEK")
     
@@ -121,7 +121,7 @@ def calculate_weighted_score(matches: Dict[str, bool]) -> float:
     """
     score = 0.0
     
-    if matches. get("part_code_match", False):
+    if matches.get("part_code_match", False):
         score += MATCH_WEIGHTS["part_code"]
     
     if matches.get("date_code_match", False):
@@ -185,7 +185,7 @@ def calculate_verdict(
     
     Args:
         matches: Pattern match results
-        ocr_confidence: OCR quality (0.0 to 1. 0)
+        ocr_confidence: OCR quality (0.0 to 1.0)
         date_validation: Date code validation result
         logo_found: Whether logo hint was detected
     

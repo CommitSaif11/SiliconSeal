@@ -10,8 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 from typing import Optional
 
-# Get project root directory (where . env is located)
-PROJECT_ROOT = Path(__file__).parent. parent. parent
+# Get project root directory (where .env is located)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     
     Note for Saif:
         All config values come from backend/.env
-        No hardcoded secrets in code! 
+        No hardcoded secrets in code!
     """
     
     # App Settings
@@ -61,13 +61,11 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-# Helper function to get KB directory path
 def get_kb_dir() -> Path:
     """Get path to knowledge base directory"""
     return PROJECT_ROOT / "src" / "kb"
 
 
-# Helper function to get static directory path
 def get_static_dir() -> Path:
     """Get path to static assets directory"""
     return PROJECT_ROOT / "src" / "static"

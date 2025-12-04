@@ -6,7 +6,7 @@ Author: Saif (CommitSaif11)
 Mentor: Zoe 💙
 """
 
-from datetime import datetime
+from datetime import datetime, timezone  # UPDATED
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 
@@ -20,35 +20,22 @@ class VerificationLog(BaseModel):
     Note for Saif:
         Every /scan request creates one document
     """
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # CHANGED
     
-    # Input data
     part_id: Optional[str] = None
-    algorithm_used: str  # "regex" or "aho_corasick"
-    
-    # OCR results
+    algorithm_used: str
     ocr_text: str
     ocr_confidence: float
-    
-    # Verification results
-    verdict: str  # "GENUINE", "FAKE", "UNCERTAIN", "MULTIPLE_CANDIDATES"
+    verdict: str
     confidence_score: float
-    
-    # Match details
     matches: Dict[str, bool]
     extracted_fields: Dict[str, Any]
-    
-    # OEM info
     oem_info: Optional[Dict[str, str]] = None
-    
-    # Flags and warnings
     flags: List[str] = []
     requires_admin_review: bool = False
-    
-    # Metadata
     image_filename: Optional[str] = None
     processing_time_ms: Optional[float] = None
-    user_id: Optional[str] = None  # For JWT auth later
+    user_id: Optional[str] = None
     
     class Config:
         json_schema_extra = {
@@ -87,7 +74,7 @@ class KBEntryModel(BaseModel):
     Stored in: kb_entries collection
     
     Note for Saif:
-        Synced with kb/kb. json file
+        Synced with kb/kb.json file
         Can be added manually OR by agent
     """
     part_id: str = Field(..., description="Unique IC part identifier")
@@ -95,16 +82,10 @@ class KBEntryModel(BaseModel):
     part_number: str = Field(..., description="Full part number")
     package: str = Field(..., description="Package type")
     logo_hint: str = Field(..., description="Logo text hint")
-    
-    # Regex patterns
-    patterns: Dict[str, str] = Field(... , description="Verification patterns")
-    
-    # Metadata
+    patterns: Dict[str, str] = Field(..., description="Verification patterns")
     source: str = Field(default="manual", description="'manual' or 'agent'")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
-    # Agent-specific fields (optional)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # CHANGED
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # CHANGED
     datasheet_url: Optional[str] = None
     agent_confidence: Optional[float] = None
     verified_by_admin: bool = False
@@ -137,22 +118,14 @@ class AgentLog(BaseModel):
     Note for Saif:
         Track all agent operations for debugging
     """
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-    
-    # Task info
-    task_type: str  # "pdf_download", "pattern_extraction", "kb_generation"
-    status: str  # "success", "failed", "pending"
-    
-    # Target info
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # CHANGED
+    task_type: str
+    status: str
     oem: Optional[str] = None
     part_number: Optional[str] = None
     datasheet_url: Optional[str] = None
-    
-    # Results
     extracted_data: Optional[Dict[str, Any]] = None
     error_message: Optional[str] = None
-    
-    # Performance
     processing_time_ms: Optional[float] = None
     
     class Config:
@@ -163,7 +136,7 @@ class AgentLog(BaseModel):
                 "status": "success",
                 "oem": "STMicroelectronics",
                 "part_number": "STM32F103C8T6",
-                "datasheet_url": "https://www.st.com/resource/en/datasheet/stm32f103c8. pdf",
+                "datasheet_url": "https://www.st.com/resource/en/datasheet/stm32f103c8.pdf",
                 "extracted_data": {
                     "part_code_pattern": "\\\\bSTM32F103C8T6\\\\b",
                     "date_code_pattern": "\\\\b[0-9]{4}\\\\b"

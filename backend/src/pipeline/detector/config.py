@@ -18,7 +18,7 @@ class DetectorConfig(BaseSettings):
     
     # Model Configuration
     MODEL_PATH: str = os.getenv(
-        "YOLO_MODEL_PATH", 
+        "YOLO_MODEL_PATH",
         "https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt"
     )
     

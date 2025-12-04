@@ -1,230 +1,265 @@
 """
-OCR Module - Multi-Pass Tesseract Text Extraction
+OCR Module - Based on Saif's Working Test Script
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
 Mentor: Zoe 💙
+
+This is a direct conversion of Saif's test script that works perfectly.
+NO modifications to the core logic.
 """
 
-import cv2
+import os
+import tempfile
+import logging
+from typing import List, Dict, Any, Optional
 import numpy as np
-import pytesseract
-from typing import Tuple, Dict, Optional
+import cv2
+from paddleocr import PaddleOCR
+import paddle
 
-# Configure Tesseract executable path for Saif's Windows installation
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+logger = logging.getLogger(__name__)
+
+# Singleton OCR instance
+_ocr_instance = None
 
 
-def preprocess(img: np.ndarray, use_adaptive: bool = True) -> np.ndarray:
+def safe_len(x):
+    """Saif's helper function - unchanged"""
+    try:
+        return len(x)
+    except Exception:
+        return 0
+
+
+def to_list(x):
+    """Saif's helper function - unchanged"""
+    try:
+        import numpy as np
+        if isinstance(x, np.ndarray):
+            return x.tolist()
+    except Exception:
+        pass
+    if isinstance(x, (list, tuple)):
+        return [to_list(i) for i in x]
+    return x
+
+
+def get_ocr_instance() -> PaddleOCR:
+    """Get singleton PaddleOCR instance - Saif's settings"""
+    global _ocr_instance
+    if _ocr_instance is None:
+        try:
+            paddle.set_device("cpu")
+        except Exception as e:
+            logger.warning(f"Device selection warning: {e}")
+
+        _ocr_instance = PaddleOCR(lang="en", use_textline_orientation=True)
+        logger.info("PaddleOCR initialized (Saif's config)")
+    return _ocr_instance
+
+
+def run_paddleocr(img: np.ndarray, min_score: float = 0.80) -> Dict[str, Any]:
     """
-    Preprocess image for optimal OCR results
-    
+    Run PaddleOCR on image - Saif's logic exactly.
+
     Args:
-        img: Input image (BGR format from OpenCV)
-        use_adaptive: Use adaptive thresholding if True, else Otsu
-    
+        img: OpenCV image (numpy array)
+        min_score: Minimum confidence threshold
+
     Returns:
-        Preprocessed binary image ready for Tesseract
-    
-    Note for Saif:
-        This improves OCR accuracy on IC markings significantly
+        Dict with rec_texts, rec_scores, rec_polys, filtered_items
     """
-    # Convert BGR to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    # Apply bilateral filter to reduce noise while preserving edges
-    # This helps with IC marking text clarity
-    filtered = cv2.bilateralFilter(gray, 9, 75, 75)
-    
-    # Normalize intensity to improve contrast
-    # This handles varying lighting conditions in industrial settings
-    normalized = cv2. normalize(filtered, None, 0, 255, cv2. NORM_MINMAX)
-    
-    # Apply thresholding based on Saif's preference
-    if use_adaptive:
-        # Adaptive thresholding works better for uneven lighting
-        # Common in factory floor camera setups
-        binary = cv2.adaptiveThreshold(
-            normalized,
-            255,
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv2. THRESH_BINARY,
-            11,  # Block size
-            2    # Constant subtracted from mean
-        )
-    else:
-        # Otsu's thresholding for uniform lighting conditions
-        _, binary = cv2.threshold(
-            normalized,
-            0,
-            255,
-            cv2. THRESH_BINARY + cv2.THRESH_OTSU
-        )
-    
-    return binary
+    ocr = get_ocr_instance()
+
+    # Save to temp file (required by ocr.predict)
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+        cv2.imwrite(tmp.name, img)
+        temp_path = tmp.name
+
+    try:
+        res_list = ocr.predict(temp_path)
+    finally:
+        os.unlink(temp_path)
+
+    if not res_list:
+        logger.warning("No OCR results")
+        return {
+            "rec_texts": [],
+            "rec_scores": [],
+            "rec_polys": [],
+            "rec_boxes": [],
+            "filtered_items": []
+        }
+
+    ocr_result = res_list[0]
+
+    rec_texts = ocr_result.get("rec_texts", [])
+    rec_scores = ocr_result.get("rec_scores", [])
+    rec_boxes = ocr_result.get("rec_boxes", [])
+    rec_polys = ocr_result.get("rec_polys", [])
+
+    n_texts = safe_len(rec_texts)
+    n_scores = safe_len(rec_scores)
+    n_boxes = safe_len(rec_boxes)
+    n_polys = safe_len(rec_polys)
+    n = min(n_texts, n_scores) if n_scores > 0 else n_texts
+
+    def get_box_or_poly(i):
+        """Saif's helper - unchanged"""
+        if n_boxes > i:
+            return rec_boxes[i]
+        if n_polys > i:
+            return rec_polys[i]
+        return None
+
+    # Filter by score - Saif's logic
+    items = []
+    for i in range(n):
+        t = rec_texts[i]
+        s = rec_scores[i] if n_scores > i else None
+        b = get_box_or_poly(i)
+        if s is not None and s < min_score:
+            continue
+        if isinstance(t, str) and t.strip() == "":
+            continue
+        items.append((t, s, b))
+
+    logger.info(f"Found {len(items)} items after filtering (min_score={min_score})")
+
+    return {
+        "rec_texts": rec_texts,
+        "rec_scores": rec_scores,
+        "rec_polys": rec_polys,
+        "rec_boxes": rec_boxes,
+        "filtered_items": items
+    }
 
 
-def run_ocr_single_pass(
-    img: np.ndarray, 
-    psm: int, 
-    whitelist: str
-) -> Tuple[str, float]:
+def group_lines_by_y(items: List[tuple], tolerance: float = 6.0) -> List[Dict[str, Any]]:
     """
-    Run single-pass Tesseract OCR with specific whitelist
-    
+    Group items by Y coordinate - Saif's logic exactly.
+
     Args:
-        img: Preprocessed binary image
-        psm: Page Segmentation Mode
-        whitelist: Character whitelist for this pass
-    
+        items: List of (text, score, box/poly) tuples
+        tolerance: Y-distance tolerance for grouping
+
     Returns:
-        Tuple of (extracted_text, average_confidence)
+        List of grouped lines with y center and texts
     """
-    # Configure Tesseract with Saif's specified parameters
-    custom_config = f"--oem 3 --psm {psm} -c tessedit_char_whitelist={whitelist}"
-    
-    # Run Tesseract OCR and get detailed output data
-    data = pytesseract.image_to_data(
-        img,
-        config=custom_config,
-        output_type=pytesseract. Output.DICT
-    )
-    
-    # Parse the OCR output for Saif
-    extracted_text = parse_ocr_output(data)
-    
-    # Calculate average confidence from valid detections
-    confidences = []
-    for i, conf in enumerate(data['conf']):
-        # Filter out invalid confidence values (-1 means no detection)
-        if conf != -1 and data['text'][i]. strip():
-            confidences.append(float(conf))
-    
-    # Compute average confidence normalized to 0. 0-1.0 range
-    if confidences:
-        avg_conf = sum(confidences) / len(confidences) / 100.0
-    else:
-        avg_conf = 0.0
-    
-    return extracted_text, avg_conf
+    rows = []
+    for (t, s, b) in items:
+        if b is None:
+            continue
+        try:
+            # poly case: [[x,y], ...]
+            if hasattr(b, "__len__") and safe_len(b) > 0 and hasattr(b[0], "__len__"):
+                y_vals = [pt[1] for pt in b]
+                y_center = float(sum(y_vals) / len(y_vals))
+            else:
+                # box case: [x,y,w,h]
+                y_center = float(b[1]) if safe_len(b) > 1 else 0.0
+        except Exception:
+            y_center = 0.0
+        rows.append((y_center, t))
+
+    rows.sort(key=lambda r: r[0])
+
+    grouped = []
+    for y, t in rows:
+        if not grouped or abs(y - grouped[-1]["y"]) > tolerance:
+            grouped.append({"y": y, "texts": [t]})
+        else:
+            grouped[-1]["texts"].append(t)
+
+    return grouped
+
+
+def extract_numeric_only(text: str) -> str:
+    """Extract only numeric characters from text"""
+    return ''.join(c for c in text if c.isdigit())
+
+
+def extract_alpha_only(text: str) -> str:
+    """Extract only alphabetic characters from text"""
+    return ''.join(c for c in text if c.isalpha())
 
 
 def run_ocr_multi_pass(
     img: np.ndarray,
-    psm: int = 6
-) -> Dict[str, Dict[str, any]]:
+    min_score: float = 0.80,
+    enable_preprocessing: bool = False
+) -> Dict[str, Any]:
     """
-    Run multi-pass OCR with field-specific whitelists (OPTION B)
-    
-    This is Saif's chosen approach for maximum accuracy! 
-    
+    Main OCR function for pipeline - based on Saif's script.
+
     Args:
-        img: Preprocessed binary image (full IC marking area)
-        psm: Page Segmentation Mode (6=uniform block, 7=single line)
-    
+        img: OpenCV image
+        min_score: Minimum confidence threshold
+        enable_preprocessing: Kept for API compatibility (unused - empirical testing showed raw images work best)
+
     Returns:
-        Dictionary containing results from all passes:
-        {
-            "full_alphanumeric": {
-                "text": "STM32F030C8T6 2347 A3B5C",
-                "confidence": 0. 87
-            },
-            "numeric_only": {
-                "text": "2347",
-                "confidence": 0.92
-            },
-            "alpha_only": {
-                "text": "STMFCT ABC",
-                "confidence": 0.78
-            }
+        Structured OCR result with grouped lines + verification-ready fields
+    """
+    _ = enable_preprocessing  # Suppress linter warning
+
+    result = run_paddleocr(img, min_score=min_score)
+    items = result["filtered_items"]
+
+    if not items:
+        return {
+            "rec_texts": [],
+            "rec_scores": [],
+            "grouped_lines": [],
+            "full_text": "",
+            "full_alphanumeric": {"text": "", "confidence": 0.0},
+            "numeric_only": {"text": "", "confidence": 0.0},
+            "alpha_only": {"text": "", "confidence": 0.0}
         }
-    
-    Note for Saif:
-        Each pass uses a different character whitelist for better accuracy
-    """
-    results = {}
-    
-    # Pass 1: Full alphanumeric (for part codes and lot codes)
-    text_alphanum, conf_alphanum = run_ocr_single_pass(
-        img,
-        psm=psm,
-        whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    )
-    results["full_alphanumeric"] = {
-        "text": text_alphanum,
-        "confidence": conf_alphanum
+
+    grouped = group_lines_by_y(items, tolerance=6.0)
+
+    full_text = " ".join([" ".join(g["texts"]) for g in grouped])
+    full_text_upper = full_text.upper()
+
+    scores = result["rec_scores"]
+    avg_conf = sum(scores) / len(scores) if scores else 0.0
+
+    numeric_text = extract_numeric_only(full_text_upper)
+    alpha_text = extract_alpha_only(full_text_upper)
+
+    return {
+        "rec_texts": result["rec_texts"],
+        "rec_scores": result["rec_scores"],
+        "grouped_lines": grouped,
+        "full_text": full_text_upper,
+        "full_alphanumeric": {
+            "text": full_text_upper,
+            "confidence": avg_conf
+        },
+        "numeric_only": {
+            "text": numeric_text,
+            "confidence": avg_conf
+        },
+        "alpha_only": {
+            "text": alpha_text,
+            "confidence": avg_conf
+        }
     }
-    
-    # Pass 2: Numeric only (for date codes - prevents letter misreads)
-    text_numeric, conf_numeric = run_ocr_single_pass(
-        img,
-        psm=psm,
-        whitelist="0123456789"
-    )
-    results["numeric_only"] = {
-        "text": text_numeric,
-        "confidence": conf_numeric
-    }
-    
-    # Pass 3: Alpha only (for logo hints and OEM names)
-    text_alpha, conf_alpha = run_ocr_single_pass(
-        img,
-        psm=psm,
-        whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    )
-    results["alpha_only"] = {
-        "text": text_alpha,
-        "confidence": conf_alpha
-    }
-    
-    return results
 
 
-def run_ocr(
-    img: np.ndarray, 
-    psm: int = 6, 
-    whitelist: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-) -> Tuple[str, float]:
+def run_ocr(img: np.ndarray, enable_preprocessing: bool = False) -> tuple:
     """
-    Main OCR function (backward compatible with single-pass mode)
-    
-    Args:
-        img: Preprocessed binary image
-        psm: Page Segmentation Mode
-        whitelist: Character whitelist (for single-pass mode)
-    
+    Simple wrapper for backward compatibility.
+
     Returns:
-        Tuple of (extracted_text, average_confidence)
-    
-    Note for Saif:
-        This is kept for backward compatibility. 
-        Use run_ocr_multi_pass() for better accuracy! 
+        (text, confidence)
     """
-    return run_ocr_single_pass(img, psm, whitelist)
+    _ = enable_preprocessing  # Suppress linter warning
 
+    result = run_ocr_multi_pass(img)
+    text = result.get("full_text", "")
 
-def parse_ocr_output(data: dict) -> str:
-    """
-    Parse Tesseract output data and clean extracted text
-    
-    Args:
-        data: Dictionary from pytesseract.image_to_data
-    
-    Returns:
-        Cleaned and formatted text string
-    
-    Note for Saif:
-        Removes noise and combines words properly for IC marking verification
-    """
-    # Extract all valid text words
-    words = []
-    for i, text in enumerate(data['text']):
-        # Remove empty strings and whitespace-only entries
-        cleaned = text.strip()
-        if cleaned:
-            # Convert to uppercase for consistent matching
-            words.append(cleaned.upper())
-    
-    # Combine words with single space separator
-    final_text = " ".join(words)
-    
-    return final_text
+    scores = result.get("rec_scores", [])
+    avg_conf = sum(scores) / len(scores) if scores else 0.0
+
+    return text, avg_conf

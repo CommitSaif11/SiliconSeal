@@ -126,9 +126,9 @@ class YOLODetector:
             for result in results:
                 boxes = result.boxes
                 
-                for i in range(len(boxes)): # type: ignore
+                for i in range(len(boxes)):  # type: ignore
                     # Extract bounding box coordinates
-                    bbox = boxes.xyxy[i].cpu().numpy().tolist()  # type: ignore # [x1, y1, x2, y2]
+                    bbox = boxes.xyxy[i].cpu().numpy().tolist()  # type: ignore  # [x1, y1, x2, y2]
                     
                     # Extract confidence and class info
                     confidence = float(boxes.conf[i].cpu().numpy())

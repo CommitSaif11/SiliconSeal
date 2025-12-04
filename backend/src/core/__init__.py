@@ -6,7 +6,7 @@ Mentor: Zoe 💙
 """
 
 from .config import settings, get_kb_dir, get_static_dir
-from . database import Database, get_database
+from .database import Database, get_database
 from .schemas import (
     ScanRequest,
     BatchScanRequest,
