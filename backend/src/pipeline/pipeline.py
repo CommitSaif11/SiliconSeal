@@ -78,15 +78,6 @@ async def process_single_image(
 ) -> Dict[str, Any]:
     """
     Full pipeline processing for a single image (async function).
-
-    Steps:
-      1. decode bytes -> OpenCV image
-      2. optional resize
-      3. YOLO detection -> get crop(s) (fallback to full image)
-      4. OCR multi-pass on primary crop
-      5. Verification (regex or aho)
-      6. Log result to MongoDB (if db provided)
-      7. Return dict matching VerificationResponse schema
     """
     global kb_index
 
@@ -100,10 +91,9 @@ async def process_single_image(
     crops = await _run_detector_get_crops(img)
     primary_crop = crops[0] if crops else img
 
-    # Run Saif's OCR (no preprocessing parameter - it's handled internally)
+    # Run OCR
     try:
         ocr_results = run_ocr_multi_pass(primary_crop, enable_preprocessing=enable_preprocessing)
-        # DEBUG: log the exact alphanumeric text and cleaned text
         full_text = ocr_results.get('full_alphanumeric', {}).get('text', '')
         logger.info(f"[OCR] full_alphanumeric.text='{full_text}'")
         cleaned = ''.join(c for c in full_text if c.isalnum())
@@ -112,7 +102,7 @@ async def process_single_image(
         logger.exception("OCR failed:", exc_info=e)
         raise
 
-    # Verify using Saif's OCR structure
+    # Verify
     try:
         if algorithm == "regex" and part_id:
             verification = verify_with_regex(ocr_results, part_id, kb_index)
@@ -133,10 +123,10 @@ async def process_single_image(
         "flags": verification.flags or [],
         "requires_admin_review": verification.requires_admin_review,
         "candidate_parts": verification.candidate_parts or [],
-        "preprocessing_applied": enable_preprocessing,  # Always False with Saif's OCR
+        "preprocessing_applied": enable_preprocessing,
     }
 
-    # DB logging with Saif's OCR structure
+    # DB logging
     try:
         if db is not None:
             full_text = ocr_results.get("full_text", "")
@@ -169,12 +159,9 @@ async def process_batch_images(
     files: List[UploadFile],
     part_id: Optional[str],
     algorithm: str,
-    enable_preprocessing: bool = False,  # ← Kept for API compatibility (Saif's decision 💙)
+    enable_preprocessing: bool = False,
     db = None
 ) -> List[Dict[str, Any]]:
-    """
-    Process multiple uploaded files in parallel and return list of responses.
-    """
     async def _process_upload(file: UploadFile):
         content = await file.read()
         return await process_single_image(

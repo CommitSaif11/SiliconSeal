@@ -1,4 +1,16 @@
 [
+   {
+    "part_id": "stm32f407zet6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F407ZET6",
+    "package": "LQFP-144",
+    "logo_hint": "ST",
+    "patterns": {
+      "part_code": "\\bSTM32F407ZET6\\b|\\bSTM\\s*32\\s*F\\s*4\\s*07\\s*Z\\s*E\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
   {
     "part_id": "stm32f030c8t6",
     "oem": "STMicroelectronics",
@@ -8,18 +20,6 @@
     "patterns": {
       "part_code": "\\bSTM\\s*32\\s*F\\s*0\\s*30\\s*C\\s*8\\s*T\\s*6\\b|\\bSTM32F030C8T6\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
-      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
-    }
-  },
-  {
-    "part_id": "stm32f407zet6",
-    "oem": "STMicroelectronics",
-    "part_number": "STM32F407ZET6",
-    "package": "LQFP-144",
-    "logo_hint": "ST",
-    "patterns": {
-      "part_code": "\\bSTM32F407ZET6\\b|\\bSTM\\s*32\\s*F\\s*4\\s*07\\s*Z\\s*E\\s*T\\s*6\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },

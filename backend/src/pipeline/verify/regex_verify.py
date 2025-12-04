@@ -25,9 +25,16 @@ def _aggressive_normalize(text: str) -> str:
     - Remove common separators: '-', '_'
     """
     t = (text or "").upper()
-    t = re.sub(r'[\-\_]', '', t)      # remove hyphen/underscore
-    t = re.sub(r'\s+', ' ', t).strip()  # collapse spaces
+    t = re.sub(r'[\-\_]', '', t)
+    t = re.sub(r'\s+', ' ', t).strip()
     return t
+
+def _strip_word_boundaries(pattern: str) -> str:
+    """
+    Remove word boundaries and anchors from a regex pattern
+    to allow matching inside concatenated alphanumeric strings.
+    """
+    return pattern.replace(r"\b", "").replace("^", "").replace("$", "")
 
 def verify_with_regex_logic(
     ocr_results: Dict[str, Dict[str, Any]],
@@ -53,6 +60,9 @@ def verify_with_regex_logic(
     alphanum_text = normalize_ocr_text(raw_alphanum)
     alphanum_text_norm = _aggressive_normalize(alphanum_text)
 
+    # Cleaned alphanumeric-only string for relaxed matching
+    alphanum_only = ''.join(c for c in alphanum_text_norm if c.isalnum())
+
     numeric_text_raw = ocr_results["numeric_only"]["text"]
     numeric_text = correct_ocr_confusion(numeric_text_raw, context="numeric")
 
@@ -60,12 +70,28 @@ def verify_with_regex_logic(
     log.info(f"[VERIFY regex] part_id={part_id}")
     log.info(f"[VERIFY regex] alphanum_raw='{raw_alphanum}'")
     log.info(f"[VERIFY regex] alphanum_norm='{alphanum_text_norm}'")
+    log.info(f"[VERIFY regex] alphanum_only='{alphanum_only}'")
     log.info(f"[VERIFY regex] numeric_raw='{numeric_text_raw}' -> '{numeric_text}'")
 
-    # Extract fields using regex patterns against aggressively normalized text
+    # First try strict matching on normalized text
     part_match = compiled_patterns.part_code.search(alphanum_text_norm)
     lot_match = compiled_patterns.lot_code.search(alphanum_text_norm)
     date_match = compiled_patterns.date_code.search(numeric_text)
+
+    # If part code didn’t match, try relaxed matching:
+    # strip word boundaries and search against alphanumeric-only string
+    if not part_match:
+        try:
+            pattern_str = compiled_patterns.part_code.pattern
+            relaxed_pattern = _strip_word_boundaries(pattern_str)
+            log.info(f"[VERIFY regex] relaxed part_code pattern='{relaxed_pattern}'")
+            part_relaxed = re.search(relaxed_pattern, alphanum_only, re.IGNORECASE)
+        except Exception as e:
+            log.warning(f"[VERIFY regex] relaxed matching error: {e}")
+            part_relaxed = None
+
+        if part_relaxed:
+            part_match = part_relaxed
 
     extracted_fields = {
         "part_code": part_match.group(0) if part_match else None,
@@ -76,9 +102,7 @@ def verify_with_regex_logic(
     }
 
     if date_match:
-        date_code = date_match.group(0)
-        # Normalize O->0 in date code before validation
-        date_code = date_code.replace('O', '0')
+        date_code = date_match.group(0).replace('O', '0')
         extracted_fields["date_code"] = date_code
         extracted_fields["date_validation"] = validate_date_code(date_code)
 
