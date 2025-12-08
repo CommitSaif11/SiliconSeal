@@ -2,7 +2,7 @@
 Detector Configuration
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from pathlib import Path

@@ -2,7 +2,7 @@
 Core Module - Configuration, Database, Schemas
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from .config import settings, get_kb_dir, get_static_dir

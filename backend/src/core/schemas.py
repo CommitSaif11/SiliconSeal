@@ -3,7 +3,7 @@ API Request and Response Schemas
 Pydantic models for FastAPI validation
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from datetime import datetime, timezone  # UPDATED

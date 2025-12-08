@@ -3,7 +3,7 @@ Database Document Models
 MongoDB collection schemas
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from datetime import datetime, timezone  # UPDATED

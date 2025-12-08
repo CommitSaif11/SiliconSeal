@@ -2,7 +2,7 @@
 OCR Module - Based on Saif's Working Test Script
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 
 This is a direct conversion of Saif's test script that works perfectly.
 NO modifications to the core logic.

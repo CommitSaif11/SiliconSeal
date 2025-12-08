@@ -3,7 +3,7 @@ Configuration Management
 Loads environment variables from .env file
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from pydantic_settings import BaseSettings, SettingsConfigDict

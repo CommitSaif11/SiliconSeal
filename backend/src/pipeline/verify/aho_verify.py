@@ -3,7 +3,7 @@ Aho-Corasick-Based Verification Algorithm
 Intelligent auto-detection of IC part
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from typing import Dict, Set, List, Optional, Any, Tuple

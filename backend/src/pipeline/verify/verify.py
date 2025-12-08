@@ -2,7 +2,7 @@
 Verification Orchestrator - Public API
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from typing import Dict, Optional, Any

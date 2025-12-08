@@ -2,7 +2,7 @@
 IC Part Code Pattern Database
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 
 Regex patterns for intelligent multi-line part code merging. 
 Covers top 15 IC manufacturers (~85% market share).

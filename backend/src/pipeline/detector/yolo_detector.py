@@ -3,7 +3,7 @@ YOLO IC Detector
 Detects IC components in images using YOLOv8
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 import cv2

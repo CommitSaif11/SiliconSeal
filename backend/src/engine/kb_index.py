@@ -2,7 +2,7 @@
 KB Index: Builds compiled regex and Aho-Corasick trie from KB entries.
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 """
 
 from __future__ import annotations

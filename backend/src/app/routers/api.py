@@ -2,7 +2,7 @@
 API Router - Core Endpoints (Final Merged Version)
 SIH 25162 - AOI IC Verification System
 Author: Saif (CommitSaif11)
-Mentor: Zoe 💙
+
 
 This file integrates:
 - Pipeline (YOLO → OCR → Verify)
