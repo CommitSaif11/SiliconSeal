@@ -1,12 +1,12 @@
 [
-   {
+  {
     "part_id": "stm32f407zet6",
     "oem": "STMicroelectronics",
     "part_number": "STM32F407ZET6",
     "package": "LQFP-144",
     "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bSTM32F407ZET6\\b|\\bSTM\\s*32\\s*F\\s*4\\s*07\\s*Z\\s*E\\s*T\\s*6\\b",
+      "part_code": "\\bSTM32F407ZET6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*4\\s*0\\s*7\\s*Z\\s*E\\s*T\\s*6\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
@@ -18,188 +18,261 @@
     "package": "LQFP-48 / QFN-48",
     "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bSTM32F[0O]30C[8B]T[6G]\\b|\\bSTM\\s32\\sF\\s*[0O]\\s3\\s0\\sC\\s[8B]\\sT\\s[6G]\\b",
+      "part_code": "\\bSTM32F[0O]30C[8B]T[6G]\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*[0O]\\s*3\\s*0\\s*C\\s*[8B]\\s*T\\s*[6G]\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
+
+  {
+    "part_id": "stm32h7r3a8i6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32H7R3A8I6",
+    "package": "BGA-169",
+    "logo_hint": "ST",
+    "patterns": {
+      "part_code": "\\bSTM32H7R3A8I6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*H\\s*7\\s*R\\s*3\\s*A\\s*8\\s*I\\s*6\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "w25q64jvs1q",
-    "oem": "Winbond",
-    "part_number": "W25Q64JVS1Q",
-    "package": "SOIC-8",
-    "logo_hint": "WINB",
+    "part_id": "stm32h7r3l8h6h",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32H7R3L8H6H",
+    "package": "BGA-225",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bW\\s*25\\s*Q\\s*64\\s*J\\s*V\\s*S\\s*1\\s*Q\\b|\\bW25Q64JVS1Q\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32H7R3L8H6H\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*H\\s*7\\s*R\\s*3\\s*L\\s*8\\s*H\\s*6\\s*H\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "ina219",
-    "oem": "Texas Instruments",
-    "part_number": "INA219",
-    "package": "SOIC-8 / SOT-23-8",
-    "logo_hint": "TI",
+    "part_id": "stm32h7s3v8h6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32H7S3V8H6",
+    "package": "BGA-100",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bI\\s*N\\s*A\\s*2\\s*1\\s*9\\b|\\bINA219\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32H7S3V8H6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*H\\s*7\\s*S\\s*3\\s*V\\s*8\\s*H\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "ads1113",
-    "oem": "Texas Instruments",
-    "part_number": "ADS1113",
-    "package": "X2QFN-10 / SOT-10 / VSSOP-10",
-    "logo_hint": "TI",
+    "part_id": "stm32h753zit6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32H753ZIT6",
+    "package": "LQFP-144",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bA\\s*D\\s*S\\s*1\\s*1\\s*1\\s*3\\b|\\bADS1113\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32H753ZIT6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*H\\s*7\\s*5\\s*3\\s*Z\\s*I\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "mcp6001",
-    "oem": "Microchip",
-    "part_number": "MCP6001",
-    "package": "SC-70-5 / SOT-23-5",
-    "logo_hint": "MICROCHIP",
+    "part_id": "stm32u585ciu6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32U585CIU6",
+    "package": "Unknown",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bM\\s*C\\s*P\\s*6\\s*0\\s*0\\s*1\\b|\\bMCP6001\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32U585CIU6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*U\\s*5\\s*8\\s*5\\s*C\\s*I\\s*U\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "lm358",
-    "oem": "Texas Instruments",
-    "part_number": "LM358",
-    "package": "SOIC-8 / SOT-23-8 / TSSOP-8 / PDIP-8",
-    "logo_hint": "TI",
+    "part_id": "stm32f303ret6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F303RET6",
+    "package": "LQFP-64",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bL\\s*M\\s*3\\s*5\\s*8\\b|\\bLM358\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F303RET6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*3\\s*0\\s*3\\s*R\\s*E\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "sn74lvc1g04",
-    "oem": "Texas Instruments",
-    "part_number": "SN74LVC1G04",
-    "package": "SOT-23-5 / SC70-5",
-    "logo_hint": "TI",
+    "part_id": "stm32h743xih6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32H743XIH6",
+    "package": "BGA-240",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bS\\s*N\\s*7\\s*4\\s*L\\s*V\\s*C\\s*1\\s*G\\s*0\\s*4\\b|\\bSN74LVC1G04\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32H743XIH6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*H\\s*7\\s*4\\s*3\\s*X\\s*I\\s*H\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "74hc1474hct14",
-    "oem": "Nexperia",
-    "part_number": "74HC14 / 74HCT14",
-    "package": "SO14 / TSSOP14 / DHVQFN14",
-    "logo_hint": "NEXP",
+    "part_id": "stm32h753vit6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32H753VIT6",
+    "package": "LQFP-100",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\b(7\\s*4\\s*H\\s*C\\s*1\\s*4|7\\s*4\\s*H\\s*C\\s*T\\s*1\\s*4)\\b|\\b(74HC14|74HCT14)\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32H753VIT6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*H\\s*7\\s*5\\s*3\\s*V\\s*I\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "sn74hc595",
-    "oem": "Texas Instruments",
-    "part_number": "SN74HC595",
-    "package": "SOIC-16 / TSSOP-16 / SSOP-16 / PDIP-16",
-    "logo_hint": "TI",
+    "part_id": "stm32f107rct6tr",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F107RCT6TR",
+    "package": "LQFP-64",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bS\\s*N\\s*7\\s*4\\s*H\\s*C\\s*5\\s*9\\s*5\\b|\\bSN74HC595\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F107RCT6TR\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*1\\s*0\\s*7\\s*R\\s*C\\s*T\\s*6\\s*T\\s*R\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "lm2596",
-    "oem": "ON Semiconductor",
-    "part_number": "LM2596",
-    "package": "TO-220 / D2PAK",
-    "logo_hint": "ONSEMI",
+    "part_id": "stm32f205rgy6tr",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F205RGY6TR",
+    "package": "Unknown",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bL\\s*M\\s*2\\s*5\\s*9\\s*6\\b|\\bLM2596\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F205RGY6TR\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*2\\s*0\\s*5\\s*R\\s*G\\s*Y\\s*6\\s*T\\s*R\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "tps5430",
-    "oem": "Texas Instruments",
-    "part_number": "TPS5430",
-    "package": "SOIC-8 / PowerPAD-8",
-    "logo_hint": "TI",
+    "part_id": "stm32f401rct7",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F401RCT7",
+    "package": "LQFP-64",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bT\\s*P\\s*S\\s*5\\s*4\\s*3\\s*0\\b|\\bTPS5430\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F401RCT7\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*4\\s*0\\s*1\\s*R\\s*C\\s*T\\s*7\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "ams1117",
-    "oem": "Advanced Monolithic Systems",
-    "part_number": "AMS1117",
-    "package": "SOT-223 / TO-252 / SOIC-8",
-    "logo_hint": "AMS",
+    "part_id": "stm32f405ogy6tr",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F405OGY6TR",
+    "package": "Unknown",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bA\\s*M\\s*S\\s*1\\s*1\\s*1\\s*7\\b|\\bAMS1117\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F405OGY6TR\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*4\\s*0\\s*5\\s*O\\s*G\\s*Y\\s*6\\s*T\\s*R\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "lm1117",
-    "oem": "ON Semiconductor",
-    "part_number": "LM1117",
-    "package": "SOT-223",
-    "logo_hint": "ONSEMI",
+    "part_id": "stm32f407zgt6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F407ZGT6",
+    "package": "LQFP-144",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bL\\s*M\\s*1\\s*1\\s*1\\s*7\\b|\\bLM1117\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F407ZGT6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*4\\s*0\\s*7\\s*Z\\s*G\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "at24c04cat24c08c",
-    "oem": "Microchip",
-    "part_number": "AT24C04C / AT24C08C",
-    "package": "SOIC-8 / TSSOP-8 / SOT-23-5 / PDIP-8",
-    "logo_hint": "MICROCHIP",
+    "part_id": "stm32f072rbt6tr",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F072RBT6TR",
+    "package": "LQFP-64",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\b(A\\s*T\\s*2\\s*4\\s*C\\s*0\\s*4\\s*C|A\\s*T\\s*2\\s*4\\s*C\\s*0\\s*8\\s*C)\\b|\\b(AT24C04C|AT24C08C)\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F072RBT6TR\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*0\\s*7\\s*2\\s*R\\s*B\\s*T\\s*6\\s*T\\s*R\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "msp430g2553",
-    "oem": "Texas Instruments",
-    "part_number": "MSP430G2553",
-    "package": "TSSOP-20 / TSSOP-28 / QFN-32",
-    "logo_hint": "TI",
+    "part_id": "stm32l072rbi6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32L072RBI6",
+    "package": "BGA-64",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bM\\s*S\\s*P\\s*4\\s*3\\s*0\\s*G\\s*2\\s*5\\s*5\\s*3\\b|\\bMSP430G2553\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32L072RBI6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*L\\s*0\\s*7\\s*2\\s*R\\s*B\\s*I\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
-    "part_id": "at24c08a",
-    "oem": "Microchip / Atmel",
-    "part_number": "AT24C08A",
-    "package": "SOIC-8 / PDIP-8 / TSSOP-8 / SOT-23-5",
-    "logo_hint": "ATMEL",
+    "part_id": "stm32u585qii6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32U585QII6",
+    "package": "Unknown",
+    "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bA\\s*T\\s*2\\s*4\\s*C\\s*0\\s*8\\s*A\\b|\\bAT24C08A\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32U585QII6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*U\\s*5\\s*8\\s*5\\s*Q\\s*I\\s*I\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
+  {
+    "part_id": "stm32f777vit6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F777VIT6",
+    "package": "LQFP-100",
+    "logo_hint": "ST",
+    "patterns": {
+      "part_code": "\\bSTM32F777VIT6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*7\\s*7\\s*7\\s*V\\s*I\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
+  {
+    "part_id": "stm32f767nih6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F767NIH6",
+    "package": "BGA-216",
+    "logo_hint": "ST",
+    "patterns": {
+      "part_code": "\\bSTM32F767NIH6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*7\\s*6\\s*7\\s*N\\s*I\\s*H\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
+  {
+    "part_id": "stm32l151ccu6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32L151CCU6",
+    "package": "QFN-48",
+    "logo_hint": "ST",
+    "patterns": {
+      "part_code": "\\bSTM32L151CCU6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*L\\s*1\\s*5\\s*1\\s*C\\s*C\\s*U\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
+  {
+    "part_id": "stm32f429vgt6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F429VGT6",
+    "package": "LQFP-100",
+    "logo_hint": "ST",
+    "patterns": {
+      "part_code": "\\bSTM32F429VGT6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*4\\s*2\\s*9\\s*V\\s*G\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
+  {
+    "part_id": "stm32f103rct6",
+    "oem": "STMicroelectronics",
+    "part_number": "STM32F103RCT6",
+    "package": "LQFP-64",
+    "logo_hint": "ST",
+    "patterns": {
+      "part_code": "\\bSTM32F103RCT6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*1\\s*0\\s*3\\s*R\\s*C\\s*T\\s*6\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   }
