@@ -7,7 +7,7 @@
     "logo_hint": "ST",
     "patterns": {
       "part_code": "\\bSTM32F407ZET6\\b|\\bSTM\\s*32\\s*F\\s*4\\s*07\\s*Z\\s*E\\s*T\\s*6\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3}\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
@@ -18,8 +18,8 @@
     "package": "LQFP-48 / QFN-48",
     "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bSTM\\s*32\\s*F\\s*0\\s*30\\s*C\\s*8\\s*T\\s*6\\b|\\bSTM32F030C8T6\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b",
+      "part_code": "\\bSTM32F[0O]30C[8B]T[6G]\\b|\\bSTM\\s32\\sF\\s*[0O]\\s3\\s0\\sC\\s[8B]\\sT\\s[6G]\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },

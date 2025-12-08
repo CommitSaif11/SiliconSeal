@@ -228,16 +228,21 @@ def calculate_verdict(
     elif ocr_confidence < 0.70:
         base_confidence *= 0.95  # Slight penalty
         flags.append("MODERATE_OCR_QUALITY")
-    
-    # Apply date validation flags
-    if date_validation:
-        if "INVALID_WEEK" in date_validation["flags"]:
-            base_confidence *= 0.70
-            flags.append("INVALID_WEEK_NUMBER")
-        
-        if "VERY_OLD_IC" in date_validation["flags"]:
-            flags.append("VERY_OLD_COMPONENT")
-            # Don't penalize score - old ICs can be genuine
+
+    # If date was captured but format is unknown (e.g., 3-digit fallback), annotate without penalizing to FAKE
+    if date_validation and "UNKNOWN_DATE_FORMAT" in date_validation.get("flags", []):
+        flags.append("UNKNOWN_DATE_FORMAT")
+
+    # Safe, small bonuses for strong signals
+    if matches.get("part_code_match") and logo_found and ocr_confidence > 0.80:
+        base_confidence += 0.05
+        flags.append("STRONG_PART_LOGO_EVIDENCE")
+
+    if matches.get("lot_code_match"):
+        base_confidence += 0.05
+        # Keep a consistent flag name; also added in regex path when heuristics picked it
+        if "LOT_HEURISTIC_MATCH" not in flags:
+            flags.append("LOT_HEURISTIC_MATCH")
     
     # Cap confidence at 1.0
     final_confidence = min(base_confidence, 1.0)

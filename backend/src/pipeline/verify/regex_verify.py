@@ -63,6 +63,7 @@ def verify_with_regex_logic(
     # Cleaned alphanumeric-only string for relaxed matching
     alphanum_only = ''.join(c for c in alphanum_text_norm if c.isalnum())
 
+    # Keep numeric context for other uses, but date will be matched on alphanum_text_norm
     numeric_text_raw = ocr_results["numeric_only"]["text"]
     numeric_text = correct_ocr_confusion(numeric_text_raw, context="numeric")
 
@@ -75,8 +76,10 @@ def verify_with_regex_logic(
 
     # First try strict matching on normalized text
     part_match = compiled_patterns.part_code.search(alphanum_text_norm)
+    # Lot/date initial regex tries on normalized alphanumeric text
     lot_match = compiled_patterns.lot_code.search(alphanum_text_norm)
-    date_match = compiled_patterns.date_code.search(numeric_text)
+    # IMPORTANT: match date on alphanumeric text (keeps boundaries/spaces), not on concatenated numerics
+    date_match = compiled_patterns.date_code.search(alphanum_text_norm)
 
     # If part code didn’t match, try relaxed matching:
     # strip word boundaries and search against alphanumeric-only string
@@ -93,18 +96,83 @@ def verify_with_regex_logic(
         if part_relaxed:
             part_match = part_relaxed
 
+    # Lot code heuristics: collect and select best candidate from full text and grouped lines
+    lot_candidates = []
+    try:
+        lot_candidates += compiled_patterns.lot_code.findall(alphanum_text_norm)
+    except Exception:
+        pass
+
+    grouped = ocr_results.get("grouped_lines", []) or []
+    for g in grouped:
+        try:
+            line_text = " ".join(g.get("texts", [])).upper().strip()
+            lot_candidates += compiled_patterns.lot_code.findall(line_text)
+        except Exception:
+            continue
+
+    # Deduplicate candidates
+    lot_candidates = list({c for c in lot_candidates})
+
+    def _score_lot(token: str) -> int:
+        t = token.upper().strip()
+        score = 0
+        length = len(t)
+        has_alpha = any(c.isalpha() for c in t)
+        has_digit = any(c.isdigit() for c in t)
+
+        # Exclusions and penalties
+        if length <= 2:
+            return -3  # too short (e.g., "VQ")
+        if not has_digit:
+            return -2  # purely alphabetic (e.g., "PHL")
+
+        # Preferences
+        if 4 <= length <= 6:
+            score += 3
+        if has_alpha and has_digit:
+            score += 2
+
+        # Avoid picking the part code itself
+        if part_match and t == part_match.group(0).upper():
+            score -= 5
+
+        return score
+
+    selected_lot = None
+    if lot_candidates:
+        scored = sorted(
+            [(c, _score_lot(c)) for c in lot_candidates],
+            key=lambda x: (x[1], len(x[0])),
+            reverse=True
+        )
+        if scored and scored[0][1] > 0:
+            selected_lot = scored[0][0]
+            log.info(f"[VERIFY regex] selected_lot='{selected_lot}' from candidates={lot_candidates}")
+
+    # Build extracted fields
     extracted_fields = {
         "part_code": part_match.group(0) if part_match else None,
         "date_code": None,
-        "lot_code": lot_match.group(0) if lot_match else None,
+        "lot_code": lot_match.group(0) if lot_match else (selected_lot if selected_lot else None),
         "logo_hint": None,
         "date_validation": None
     }
 
+    # Date extraction and validation (allow fallback formats; annotate unknown format)
     if date_match:
         date_code = date_match.group(0).replace('O', '0')
         extracted_fields["date_code"] = date_code
-        extracted_fields["date_validation"] = validate_date_code(date_code)
+        if re.match(r'^\d{4}$', date_code):
+            extracted_fields["date_validation"] = validate_date_code(date_code)
+        else:
+            # Non-YYWW fallback captured (e.g., 3-digit) — mark unknown format
+            extracted_fields["date_validation"] = {
+                "valid": False,
+                "year": None,
+                "week": None,
+                "flags": ["UNKNOWN_DATE_FORMAT"]
+            }
 
     # Logo hint
     if kb_entry.logo_hint and kb_entry.logo_hint.strip():
@@ -112,13 +180,20 @@ def verify_with_regex_logic(
         if logo_pattern.search(alphanum_text_norm):
             extracted_fields["logo_hint"] = kb_entry.logo_hint
 
+   # Only count 4-digit YYWW as a true date match
+    date_valid = bool(
+        extracted_fields.get("date_validation")
+        and extracted_fields["date_validation"].get("valid")
+    )
+
     matches = {
         "part_code_match": extracted_fields["part_code"] is not None,
-        "date_code_match": extracted_fields["date_code"] is not None,
+        "date_code_match": date_valid,
         "lot_code_match": extracted_fields["lot_code"] is not None,
-        "logo_hint_match": extracted_fields["logo_hint"] is not None
+        "logo_hint_match": extracted_fields["logo_hint"] is not None,
     }
 
+    # Average OCR confidence from two passes (as before)
     avg_ocr_conf = (
         ocr_results["full_alphanumeric"]["confidence"] +
         ocr_results["numeric_only"]["confidence"]
@@ -130,6 +205,10 @@ def verify_with_regex_logic(
         date_validation=extracted_fields["date_validation"],
         logo_found=matches["logo_hint_match"]
     )
+
+    # If lot was selected via heuristic (not direct regex on full text), annotate
+    if not lot_match and extracted_fields["lot_code"]:
+        flags.append("LOT_HEURISTIC_MATCH")
 
     oem_info = {
         "oem": kb_entry.oem,
