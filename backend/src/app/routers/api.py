@@ -41,7 +41,7 @@ from engine.kb_loader import load_raw_kb, validate_entry
 
 # Pipeline functions (YOLO → OCR → VERIFY)
 from pipeline.pipeline import process_single_image, process_batch_images
-
+from app.routers import kb_admin
 
 router = APIRouter()
 
@@ -290,3 +290,6 @@ async def reload_knowledge_base():
         }
     except Exception as e:
         raise HTTPException(500, f"Failed to reload KB: {str(e)}")
+    
+
+router.include_router(kb_admin.router, prefix="", tags=["admin"])

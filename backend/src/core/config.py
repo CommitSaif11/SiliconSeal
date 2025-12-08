@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str = ""
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # Mouser API (new)
+    MOUSER_API_KEY: str = ""
     
     # Model configuration
     model_config = SettingsConfigDict(

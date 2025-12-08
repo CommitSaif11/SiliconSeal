@@ -15,15 +15,14 @@
     "part_id": "stm32f030c8t6",
     "oem": "STMicroelectronics",
     "part_number": "STM32F030C8T6",
-    "package": "LQFP-48 / QFN-48",
+    "package": "LQFP-48",
     "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\bSTM32F[0O]30C[8B]T[6G]\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*[0O]\\s*3\\s*0\\s*C\\s*[8B]\\s*T\\s*[6G]\\b",
-      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
-      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+      "part_code": "\\\\bSTM32F030C8T6\\\\b|\\\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*0\\s*3\\s*0\\s*C\\s*8\\s*T\\s*6\\\\b",
+      "date_code": "\\\\b[0-9O]{2}\\\\s*[0-9O]{2}\\\\b|\\\\b[0-9O]{3,4}\\\\b",
+      "lot_code": "\\\\b[0-9A-Z]{2,10}\\\\b"
     }
   },
-
   {
     "part_id": "stm32h7r3a8i6",
     "oem": "STMicroelectronics",
@@ -274,6 +273,30 @@
       "part_code": "\\bSTM32F103RCT6\\b|\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*1\\s*0\\s*3\\s*R\\s*C\\s*T\\s*6\\b",
       "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
       "lot_code": "\\b[0-9A-Z]{2,10}\\b"
+    }
+  },
+  {
+    "part_id": "ina219",
+    "oem": "Texas Instruments",
+    "part_number": "INA219",
+    "package": "Unknown",
+    "logo_hint": "TI",
+    "patterns": {
+      "part_code": "\\\\bINA219\\\\b|\\\\bI\\s*N\\s*A\\s*2\\s*1\\s*9\\\\b",
+      "date_code": "\\\\b[0-9O]{2}\\\\s*[0-9O]{2}\\\\b|\\\\b[0-9O]{3,4}\\\\b",
+      "lot_code": "\\\\b[0-9A-Z]{2,10}\\\\b"
+    }
+  },
+  {
+    "part_id": "w25n512gveigs",
+    "oem": "Winbond",
+    "part_number": "W25N512GVEIGS",
+    "package": "Unknown",
+    "logo_hint": "WINB",
+    "patterns": {
+      "part_code": "\\\\bW25N512GVEIGS\\\\b|\\\\bW\\s*2\\s*5\\s*N\\s*5\\s*1\\s*2\\s*G\\s*V\\s*E\\s*I\\s*G\\s*S\\\\b",
+      "date_code": "\\\\b[0-9O]{2}\\\\s*[0-9O]{2}\\\\b|\\\\b[0-9O]{3,4}\\\\b",
+      "lot_code": "\\\\b[0-9A-Z]{2,10}\\\\b"
     }
   }
 ]
