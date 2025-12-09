@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function AdminLogin() {
+export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ function AdminLogin() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // For now: accept every email & password
+    // UI-only auth for now
     localStorage.setItem("bel_admin_email", email || "admin@example.com");
     localStorage.setItem("bel_role", "admin");
 
@@ -63,5 +63,3 @@ function AdminLogin() {
     </section>
   );
 }
-
-export default AdminLogin;

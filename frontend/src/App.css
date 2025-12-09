@@ -1,42 +1,67 @@
+/* REMOVE ALL DEFAULT VITE CSS */
+/* This is a clean Tailwind-ready index.css */
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth rendering */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Light mode */
+body {
+  @apply bg-gray-100 text-gray-900;
+}
+
+/* Dark mode */
+.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+/* Container fix — remove Vite padding + center text */
 #root {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 0;        /* REMOVE 2rem that caused shrinking */
+  text-align: left;  /* FIX: stop centering everything */
+  width: 100%;       /* Allow full expansion */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
+/* BEL Card */
 .card {
-  padding: 2em;
+  @apply rounded-xl shadow-md p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700;
 }
 
-.read-the-docs {
-  color: #888;
+/* Title */
+.page-title {
+  @apply text-3xl font-bold mb-4;
 }
+
+/* Input fields */
+.input {
+  @apply w-full text-sm border border-gray-300 dark:border-gray-700 
+         rounded-md px-2 py-1.5 bg-white dark:bg-gray-900;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply px-4 py-2 rounded-md font-medium text-white bg-blue-600 
+         hover:bg-blue-700 transition-transform transform hover:-translate-y-0.5;
+}
+
+/* Enlarging Result Box */
+.result-box {
+  min-height: 450px;   /* Makes it LARGE even when empty */
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: 20px;
+}
+
+
+

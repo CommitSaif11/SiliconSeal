@@ -2,13 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Smooth theme transitions */
-* {
-  transition: background-color 0.15s ease, color 0.15s ease;
+/* ------------------------------
+   GLOBAL UI IMPROVEMENTS
+--------------------------------*/
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Let the app use full width & height */
 body {
-  margin: 0;
-  min-height: 100vh;
+  @apply bg-gray-100 text-gray-900;
+}
+
+.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+/* Root container fix */
+#root {
+  margin: 0 auto;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+/* Card styling */
+.card {
+  @apply rounded-xl shadow-md p-5 bg-white dark:bg-gray-800 
+         border border-gray-200 dark:border-gray-700;
+}
+
+/* Titles */
+.page-title {
+  @apply text-3xl font-bold mb-4;
+}
+
+.section-title {
+  @apply text-lg font-semibold mb-2;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply px-4 py-2 rounded-md font-medium text-white bg-blue-600 
+         hover:bg-blue-700 transition-transform transform hover:-translate-y-0.5;
+}
+
+/* Inputs */
+.input {
+  @apply w-full text-sm border border-gray-300 dark:border-gray-700 
+         rounded-md px-2 py-1.5 bg-white dark:bg-gray-900;
+}
+
+/* File input */
+.file-input {
+  @apply block w-full text-sm border border-gray-300 dark:border-gray-700
+         bg-white dark:bg-gray-900
+         file:mr-3 file:py-1.5 file:px-3
+         file:rounded-md file:border-0
+         file:bg-blue-600 file:text-white
+         hover:file:bg-blue-700;
+}
+
+/* ===========================
+   RESULT BOX — FINAL VERSION
+   =========================== */
+
+.result-box {
+  min-height: 450px;       /* Ensures large height ALWAYS */
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: 20px;
 }

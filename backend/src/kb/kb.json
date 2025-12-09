@@ -15,12 +15,12 @@
     "part_id": "stm32f030c8t6",
     "oem": "STMicroelectronics",
     "part_number": "STM32F030C8T6",
-    "package": "LQFP-48",
+    "package": "LQFP-48 / QFN-48",
     "logo_hint": "ST",
     "patterns": {
-      "part_code": "\\\\bSTM32F030C8T6\\\\b|\\\\bS\\s*T\\s*M\\s*3\\s*2\\s*F\\s*0\\s*3\\s*0\\s*C\\s*8\\s*T\\s*6\\\\b",
-      "date_code": "\\\\b[0-9O]{2}\\\\s*[0-9O]{2}\\\\b|\\\\b[0-9O]{3,4}\\\\b",
-      "lot_code": "\\\\b[0-9A-Z]{2,10}\\\\b"
+      "part_code": "\\bSTM32F[0O]30C[8B]T[6G]\\b|\\bSTM\\s32\\sF\\s*[0O]\\s3\\s0\\sC\\s[8B]\\sT\\s[6G]\\b",
+      "date_code": "\\b[0-9O]{2}\\s*[0-9O]{2}\\b|\\b[0-9O]{3,4}\\b",
+      "lot_code": "\\b[0-9A-Z]{2,10}\\b"
     }
   },
   {
@@ -295,6 +295,30 @@
     "logo_hint": "WINB",
     "patterns": {
       "part_code": "\\\\bW25N512GVEIGS\\\\b|\\\\bW\\s*2\\s*5\\s*N\\s*5\\s*1\\s*2\\s*G\\s*V\\s*E\\s*I\\s*G\\s*S\\\\b",
+      "date_code": "\\\\b[0-9O]{2}\\\\s*[0-9O]{2}\\\\b|\\\\b[0-9O]{3,4}\\\\b",
+      "lot_code": "\\\\b[0-9A-Z]{2,10}\\\\b"
+    }
+  },
+  {
+    "part_id": "atmega328p",
+    "oem": "Microchip Technology",
+    "part_number": "ATMEGA328P",
+    "package": "Unknown",
+    "logo_hint": "MICROCHIP",
+    "patterns": {
+      "part_code": "\\\\bATMEGA328P\\\\b|\\\\bA\\s*T\\s*M\\s*E\\s*G\\s*A\\s*3\\s*2\\s*8\\s*P\\\\b",
+      "date_code": "\\\\b[0-9O]{2}\\\\s*[0-9O]{2}\\\\b|\\\\b[0-9O]{3,4}\\\\b",
+      "lot_code": "\\\\b[0-9A-Z]{2,10}\\\\b"
+    }
+  },
+  {
+    "part_id": "osd3358-512m-icb",
+    "oem": "Octavo Systems",
+    "part_number": "OSD3358-512M-ICB",
+    "package": "Unknown",
+    "logo_hint": "OCTA",
+    "patterns": {
+      "part_code": "\\\\bOSD3358-512M-ICB\\\\b|\\\\bO\\s*S\\s*D\\s*3\\s*3\\s*5\\s*8\\s*-\\s*5\\s*1\\s*2\\s*M\\s*-\\s*I\\s*C\\s*B\\\\b",
       "date_code": "\\\\b[0-9O]{2}\\\\s*[0-9O]{2}\\\\b|\\\\b[0-9O]{3,4}\\\\b",
       "lot_code": "\\\\b[0-9A-Z]{2,10}\\\\b"
     }
