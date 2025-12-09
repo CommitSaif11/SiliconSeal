@@ -187,7 +187,7 @@ async def scan_frame(
 @router.post("/scan/batch")
 async def scan_batch(
     files: List[UploadFile] = File(...),
-    part_id: str = Form(...),
+    part_id: Optional[str] = Form(None),
     algorithm: str = Form("regex"),             # Batch mode defaults to regex
     enable_preprocessing: bool = Form(False),   # ← NEW: OCR preprocessing toggle 💙
     db: AsyncIOMotorDatabase = Depends(get_database)
