@@ -172,7 +172,7 @@ export default function Home() {
             <span className="font-semibold gradient-text">SiliconSeal</span>
             <span>— SIH 2025 | BEL India</span>
           </div>
-          <div>Built by Saif</div>
+          <div>Built by NextGen Coders 1</div>
         </div>
       </footer>
     </div>

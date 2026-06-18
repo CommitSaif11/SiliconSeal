@@ -246,7 +246,7 @@ export default function Architecture() {
         <Code className="w-8 h-8 text-gray-400 mx-auto mb-3" />
         <h3 className="font-bold text-gray-900 dark:text-white mb-1">Smart India Hackathon 2025 — Finalist</h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">Problem Statement ID: 25162 | Organization: Bharat Electronics Limited (BEL)</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Built by Saif</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Built by NextGen Coders 1</p>
       </div>
     </div>
   );
