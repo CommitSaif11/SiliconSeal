@@ -1,79 +1,59 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* ------------------------------
-   GLOBAL UI IMPROVEMENTS
---------------------------------*/
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  --color-accent-400: #a78bfa;
+  --color-accent-500: #8b5cf6;
+  --color-accent-600: #7c3aed;
+
+  --color-success-500: #22c55e;
+  --color-danger-500: #ef4444;
+  --color-warning-500: #f59e0b;
+}
+
+* {
+  scrollbar-width: thin;
 }
 
 body {
-  @apply bg-gray-100 text-gray-900;
+  font-family: var(--font-sans);
 }
 
-.dark body {
-  @apply bg-gray-900 text-gray-100;
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* Root container fix */
-#root {
-  margin: 0 auto;
-  padding: 0;
-  text-align: left;
-  width: 100%;
+:is(.dark .glass) {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Card styling */
-.card {
-  @apply rounded-xl shadow-md p-5 bg-white dark:bg-gray-800 
-         border border-gray-200 dark:border-gray-700;
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Titles */
-.page-title {
-  @apply text-3xl font-bold mb-4;
+.glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 60px rgba(139, 92, 246, 0.05);
 }
 
-.section-title {
-  @apply text-lg font-semibold mb-2;
-}
-
-/* Buttons */
-.btn-primary {
-  @apply px-4 py-2 rounded-md font-medium text-white bg-blue-600 
-         hover:bg-blue-700 transition-transform transform hover:-translate-y-0.5;
-}
-
-/* Inputs */
-.input {
-  @apply w-full text-sm border border-gray-300 dark:border-gray-700 
-         rounded-md px-2 py-1.5 bg-white dark:bg-gray-900;
-}
-
-/* File input */
-.file-input {
-  @apply block w-full text-sm border border-gray-300 dark:border-gray-700
-         bg-white dark:bg-gray-900
-         file:mr-3 file:py-1.5 file:px-3
-         file:rounded-md file:border-0
-         file:bg-blue-600 file:text-white
-         hover:file:bg-blue-700;
-}
-
-/* ===========================
-   RESULT BOX — FINAL VERSION
-   =========================== */
-
-.result-box {
-  min-height: 450px;       /* Ensures large height ALWAYS */
-  width: 100%;
-  height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
-  padding-bottom: 20px;
+:is(.dark .glow) {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), 0 0 80px rgba(139, 92, 246, 0.1);
 }

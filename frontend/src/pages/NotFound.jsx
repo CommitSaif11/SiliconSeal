@@ -1,21 +1,20 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { Home, AlertTriangle } from 'lucide-react';
 
-function NotFound() {
+export default function NotFound() {
   return (
-    <section className="text-center mt-16">
-      <h1 className="text-3xl font-bold mb-2">404</h1>
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-        The page you are looking for does not exist.
-      </p>
-      <Link
-        to="/"
-        className="inline-block px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-transform transform hover:-translate-y-0.5"
-      >
-        Go back Home
-      </Link>
-    </section>
+    <div className="min-h-[70vh] flex items-center justify-center px-4">
+      <div className="text-center space-y-4">
+        <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto" />
+        <h1 className="text-6xl font-black gradient-text">404</h1>
+        <p className="text-lg text-gray-500 dark:text-gray-400">Page not found</p>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition-colors"
+        >
+          <Home className="w-4 h-4" /> Back to Home
+        </Link>
+      </div>
+    </div>
   );
 }
-
-export default NotFound;
