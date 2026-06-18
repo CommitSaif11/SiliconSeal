@@ -47,11 +47,11 @@ def find_candidate_parts(
     token_hits = kb_index.aho_search(combined_text)
     
     # Collect candidate part IDs
+    logo_hints = {e.logo_hint.lower() for e in kb_index.entries if e.logo_hint}
     candidates = set()
     for token, part_ids in token_hits.items():
-        # Apply Saif's minimum token length filter
-        # Exception: Logo hints can be 4 chars
-        if len(token) >= min_token_length or len(token) >= 4:
+        is_logo = token.lower() in logo_hints
+        if len(token) >= min_token_length or (is_logo and len(token) >= 2):
             candidates.update(part_ids)
     
     return candidates

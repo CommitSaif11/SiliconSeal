@@ -12,9 +12,10 @@ backend/.venv/
 backend/env/
 backend/venv/
 
-# Environment files
+# Environment files (keep .env.example for documentation)
 backend/.env
 backend/.env.*
+!backend/.env.example
 
 # Build artifacts
 backend/build/
@@ -37,6 +38,14 @@ backend/*.swp
 backend/*.bak
 backend/.reload/
 
+# Test images and dev scripts
+backend/*.png
+backend/*.jpg
+backend/*.jpeg
+backend/test_*.py
+backend/improved_*.py
+backend/inspect_*.py
+
 
 # =========================================
 #  NODE / FRONTEND (Future)
@@ -55,3 +64,4 @@ frontend/.env.*
 .DS_Store
 Thumbs.db
 .vscode/
+documentation/

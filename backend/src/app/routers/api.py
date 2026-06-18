@@ -1,19 +1,3 @@
-"""
-API Router - Core Endpoints (Final Merged Version)
-SIH 25162 - AOI IC Verification System
-Author: Saif (CommitSaif11)
-
-
-This file integrates:
-- Pipeline (YOLO → OCR → Verify)
-- KB loader
-- MongoDB logging
-- Admin tools
-- Public operator endpoints
-
-This is the final merged and stable version.
-"""
-
 import base64
 from typing import Optional, List
 
@@ -26,66 +10,37 @@ from fastapi import (
     Depends
 )
 
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
-# Core config + DB
 from core.config import settings
-from core import (
-    get_database,
-    PartsListResponse,
-    KBEntryResponse
-)
+from core import require_admin, PartsListResponse, KBEntryResponse
 
-# KB loader (works with single kb.json file)
 from engine.kb_loader import load_raw_kb, validate_entry
-
-# Pipeline functions (YOLO → OCR → VERIFY)
-from pipeline.pipeline import process_single_image, process_batch_images
+from pipeline.pipeline import process_single_image, process_batch_images, reload_kb_index
 from app.routers import kb_admin
 
 router = APIRouter()
 
-# =====================================================================================
-# 1️⃣ HEALTH CHECK (App + Database)
-# =====================================================================================
+MAX_UPLOAD_BYTES = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+MAX_BASE64_BYTES = MAX_UPLOAD_BYTES * 4 // 3 + 100
+
+
 @router.get("/health")
 async def health_check():
-    """
-    Health check endpoint for FastAPI + MongoDB status.
-    Shown on dashboard & used by frontend for initial boot status.
-    """
-    try:
-        db = await get_database()
-        await db.command("ping")
-        db_status = "connected"
-    except Exception as e:
-        db_status = f"disconnected ({str(e)})"
-
     return {
         "status": "healthy",
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "database": db_status,
-        "author": "Saif (CommitSaif11)",
-        "mentor": "Zoe 💙"
     }
 
 
-# =====================================================================================
-# 2️⃣ GET /parts — Public operator endpoint
-# =====================================================================================
 @router.get("/parts", response_model=PartsListResponse)
 async def get_parts_list():
-    """
-    Returns list of all part IDs in KB.
-    
-    NOTE:
-    - Used for dropdown in frontend.
-    - Does NOT expose OEM patterns (admin-only).
-    """
     try:
-        kb_data = load_raw_kb()
-        part_ids = [entry["part_id"] for entry in kb_data]
+        from pipeline.pipeline import kb_index as _idx
+        if _idx is not None and hasattr(_idx, "entries"):
+            part_ids = [e.part_id for e in _idx.entries]
+        else:
+            kb_data = load_raw_kb()
+            part_ids = [entry["part_id"] for entry in kb_data]
         return {
             "status": "success",
             "count": len(part_ids),
@@ -95,145 +50,109 @@ async def get_parts_list():
         raise HTTPException(500, f"Failed to fetch parts: {str(e)}")
 
 
-# =====================================================================================
-# 3️⃣ POST /scan — Single image upload
-# =====================================================================================
 @router.post("/scan")
 async def scan_image(
     file: UploadFile = File(...),
-    part_id: Optional[str] = Form(None),        # Optional → auto-detect mode supported
-    algorithm: str = Form("aho_corasick"),      # "regex" or "aho_corasick"
-    enable_preprocessing: bool = Form(False),   # ← NEW: OCR preprocessing toggle 💙
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    part_id: Optional[str] = Form(None),
+    algorithm: str = Form("aho_corasick"),
+    enable_preprocessing: bool = Form(False),
+    use_ai: bool = Form(False),
 ):
-    """
-    Performs the FULL pipeline on one uploaded image.
-    Calls process_single_image() → YOLO → OCR → VERIFY → DB log.
-    
-    Args:
-        file: Uploaded image file
-        part_id: Optional part ID (auto-detect if None)
-        algorithm: Verification algorithm ("regex" or "aho_corasick")
-        enable_preprocessing: Apply OCR preprocessing (default: False)
-        db: MongoDB database instance
-    
-    Returns:
-        Complete verification result with OCR data, YOLO detection, and verification status
-    
-    Note for Saif:
-        - enable_preprocessing=False (default): Raw image OCR - best for high-quality IC images
-        - enable_preprocessing=True: Minimal preprocessing - may help low-quality images
-    """
+    image_bytes = await file.read()
+    if len(image_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, f"File too large. Max {settings.MAX_UPLOAD_SIZE_MB}MB")
+
     try:
-        image_bytes = await file.read()
         result = await process_single_image(
             image_bytes=image_bytes,
             part_id=part_id,
             algorithm=algorithm,
             enable_preprocessing=enable_preprocessing,
-            db=db
         )
+
+        if use_ai and settings.AI_ENABLED and settings.GROQ_API_KEY:
+            from pipeline.intelligence.ai_agent import analyze_verification
+            ai_result = await analyze_verification(result)
+            result["ai_analysis"] = ai_result
+
         return result
     except Exception as e:
         raise HTTPException(500, f"Scan processing failed: {str(e)}")
 
 
-# =====================================================================================
-# 4️⃣ POST /scan/frame — Base64 image from live camera stream
-# =====================================================================================
 @router.post("/scan/frame")
 async def scan_frame(
-    frame: str = Form(...),                     # Base64 string
+    frame: str = Form(...),
     part_id: Optional[str] = Form(None),
     algorithm: str = Form("aho_corasick"),
-    enable_preprocessing: bool = Form(False),   # ← NEW: OCR preprocessing toggle 💙
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    enable_preprocessing: bool = Form(False),
+    use_ai: bool = Form(False),
 ):
-    """
-    Used for continuous live-camera mode (webcam, mobile camera streaming).
-    Base64 → decoded → pipeline. 
-    
-    Args:
-        frame: Base64-encoded image string
-        part_id: Optional part ID (auto-detect if None)
-        algorithm: Verification algorithm ("regex" or "aho_corasick")
-        enable_preprocessing: Apply OCR preprocessing (default: False)
-        db: MongoDB database instance
-    
-    Returns:
-        Complete verification result
-    
-    Note for Saif:
-        - enable_preprocessing=False (default): Raw image OCR - recommended
-        - enable_preprocessing=True: Minimal preprocessing for low-quality frames
-    """
+    if len(frame) > MAX_BASE64_BYTES:
+        raise HTTPException(413, f"Frame too large. Max {settings.MAX_UPLOAD_SIZE_MB}MB decoded")
+
     try:
         image_bytes = base64.b64decode(frame)
+    except Exception:
+        raise HTTPException(400, "Invalid base64 encoding")
+
+    if len(image_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, f"Decoded frame too large. Max {settings.MAX_UPLOAD_SIZE_MB}MB")
+
+    try:
         result = await process_single_image(
             image_bytes=image_bytes,
             part_id=part_id,
             algorithm=algorithm,
             enable_preprocessing=enable_preprocessing,
-            db=db
         )
+
+        if use_ai and settings.AI_ENABLED and settings.GROQ_API_KEY:
+            from pipeline.intelligence.ai_agent import analyze_verification
+            ai_result = await analyze_verification(result)
+            result["ai_analysis"] = ai_result
+
         return result
     except Exception as e:
         raise HTTPException(500, f"Frame processing failed: {str(e)}")
 
 
-# =====================================================================================
-# 5️⃣ POST /scan/batch — Multiple images uploaded
-# =====================================================================================
 @router.post("/scan/batch")
 async def scan_batch(
     files: List[UploadFile] = File(...),
     part_id: Optional[str] = Form(None),
-    algorithm: str = Form("regex"),             # Batch mode defaults to regex
-    enable_preprocessing: bool = Form(False),   # ← NEW: OCR preprocessing toggle 💙
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    algorithm: str = Form("regex"),
+    enable_preprocessing: bool = Form(False),
 ):
-    """
-    Batch verification. Processes multiple uploads in parallel.
-    
-    Args:
-        files: List of uploaded image files
-        part_id: Part ID to verify against
-        algorithm: Verification algorithm ("regex" or "aho_corasick")
-        enable_preprocessing: Apply OCR preprocessing (default: False)
-        db: MongoDB database instance
-    
-    Returns:
-        Batch results with individual verification statuses
-    
-    Note for Saif:
-        - enable_preprocessing=False (default): Raw image OCR for all images
-        - enable_preprocessing=True: Applies preprocessing to all batch images
-    """
+    if len(files) > settings.MAX_BATCH_FILES:
+        raise HTTPException(413, f"Too many files. Max {settings.MAX_BATCH_FILES} per batch")
+
+    for f in files:
+        content = await f.read()
+        if len(content) > MAX_UPLOAD_BYTES:
+            raise HTTPException(413, f"File '{f.filename}' too large. Max {settings.MAX_UPLOAD_SIZE_MB}MB")
+        await f.seek(0)
+
     try:
         results = await process_batch_images(
             files=files,
             part_id=part_id,
             algorithm=algorithm,
             enable_preprocessing=enable_preprocessing,
-            db=db
         )
         return {
             "status": "success",
+            "total": len(results),
             "results": results
         }
     except Exception as e:
         raise HTTPException(500, f"Batch processing failed: {str(e)}")
 
 
-# =====================================================================================
-# 6️⃣ ADMIN: GET /kb — View full KB entries
-# =====================================================================================
+# --- Admin endpoints (JWT required) ---
+
 @router.get("/kb")
-async def get_kb_list():
-    """
-    ADMIN ONLY — Show full KB entries (includes regex / metadata)
-    🚨 AUTH WILL BE ADDED LATER using JWT.
-    """
+async def get_kb_list(_user: dict = Depends(require_admin)):
     try:
         kb_data = load_raw_kb()
         return {
@@ -246,14 +165,8 @@ async def get_kb_list():
         raise HTTPException(500, f"Failed to list KB: {str(e)}")
 
 
-# =====================================================================================
-# 7️⃣ ADMIN: GET /kb/{part_id} — Detailed OEM pattern
-# =====================================================================================
 @router.get("/kb/{part_id}", response_model=KBEntryResponse)
-async def get_kb_entry(part_id: str):
-    """
-    ADMIN ONLY — Fetch full KB record for a single part.
-    """
+async def get_kb_entry(part_id: str, _user: dict = Depends(require_admin)):
     try:
         kb_data = load_raw_kb()
         kb_entry = next((i for i in kb_data if i["part_id"] == part_id), None)
@@ -272,24 +185,17 @@ async def get_kb_entry(part_id: str):
         raise HTTPException(500, f"Failed to load KB entry: {str(e)}")
 
 
-# =====================================================================================
-# 8️⃣ ADMIN: POST /admin/reload-kb — Reload KB (for future dynamic updates)
-# =====================================================================================
 @router.post("/admin/reload-kb")
-async def reload_knowledge_base():
-    """
-    Reload KB from disk. Useful during development.
-    In future: This will trigger rebuilding Aho-Corasick automaton.
-    """
+async def reload_knowledge_base(_user: dict = Depends(require_admin)):
     try:
-        kb_data = load_raw_kb()
+        count = await reload_kb_index()
         return {
             "status": "success",
-            "message": "KB reload successful",
-            "count": len(kb_data)
+            "message": "KB reloaded and index rebuilt",
+            "count": count
         }
     except Exception as e:
         raise HTTPException(500, f"Failed to reload KB: {str(e)}")
-    
+
 
 router.include_router(kb_admin.router, prefix="", tags=["admin"])

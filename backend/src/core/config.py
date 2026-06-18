@@ -15,44 +15,38 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
-    """
-    Application settings loaded from .env file
-    
-    Note for Saif:
-        All config values come from backend/.env
-        No hardcoded secrets in code!
-    """
-    
-    # App Settings
+    # App
     APP_NAME: str = "SIH 25162 - AOI IC Verification"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
-    
-    # MongoDB Settings
-    MONGODB_URL: str
-    MONGODB_DB_NAME: str = "sih_aoi_system"
-    
-    # YOLO Settings
+
+    # CORS
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+
+    # YOLO
     YOLO_MODEL_PATH: str
     YOLO_CONFIDENCE: float = 0.25
     YOLO_DEVICE: str = "cpu"
-    
-    # Tesseract Settings
-    TESSERACT_CMD: str = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-    
-    # Ollama Settings (for agent - later)
-    OLLAMA_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama2"
-    
-    # Security Settings (JWT - later)
-    SECRET_KEY: str = ""
+
+    # Security (JWT)
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ADMIN_USERNAME: str = "admin"
+    ADMIN_PASSWORD_HASH: str = ""
 
-    # Mouser API (new)
+    # Upload limits
+    MAX_UPLOAD_SIZE_MB: int = 10
+    MAX_BATCH_FILES: int = 20
+
+    # Mouser API
     MOUSER_API_KEY: str = ""
-    
-    # Model configuration
+
+    # AI Agent
+    GROQ_API_KEY: str = ""
+    AI_MODEL: str = "llama-3.3-70b-versatile"
+    AI_ENABLED: bool = True
+
     model_config = SettingsConfigDict(
         env_file=str(PROJECT_ROOT / ".env"),
         env_file_encoding="utf-8",

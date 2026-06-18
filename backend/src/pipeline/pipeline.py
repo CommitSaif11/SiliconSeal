@@ -1,14 +1,9 @@
-# Pipeline orchestrator: YOLO -> OCR -> Verify -> DB log
 import asyncio
-import base64
 import logging
 from typing import Optional, List, Dict, Any
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import UploadFile
 import numpy as np
-from datetime import datetime, timezone
-
-from core import get_database
-from core.config import settings
 
 from utils.image_utils import decode_image, resize_image_max
 from pipeline.ocr.ocr import run_ocr_multi_pass
@@ -16,15 +11,11 @@ from pipeline.verify.verify import verify_with_aho, verify_with_regex
 
 logger = logging.getLogger(__name__)
 
-# Global KB index placeholder (attempt to load in initialize_pipeline)
 kb_index = None
+_ocr_executor = ThreadPoolExecutor(max_workers=4)
 
 
 async def initialize_pipeline():
-    """
-    Attempt to load KB index (if engine.kb_index provides loader).
-    This is optional; pipeline will still run with kb_index=None (auto-detection may be limited).
-    """
     global kb_index
     try:
         from engine.kb_index import load_kb_index
@@ -34,17 +25,19 @@ async def initialize_pipeline():
         )
     except Exception as e:
         kb_index = None
-        logger.warning(
-            f"Pipeline: Could not load KB index at startup: {e}. Pipeline will still run but auto-detection may be limited."
-        )
+        logger.warning(f"Pipeline: Could not load KB index at startup: {e}")
+
+
+async def reload_kb_index() -> int:
+    global kb_index
+    from engine.kb_index import load_kb_index
+    kb_index = load_kb_index()
+    count = len(kb_index.entries) if hasattr(kb_index, "entries") else 0
+    logger.info(f"Pipeline: KB index reloaded (entries={count})")
+    return count
 
 
 async def _run_detector_get_crops(image: "np.ndarray") -> List[Any]:
-    """
-    Try to run YOLO detector to get crop regions.
-    If detector is not present or fails, return the original full image as single crop.
-    Detector module expected (if present): pipeline.detector.yolo_detector with a function detect or detect_crops.
-    """
     try:
         from pipeline.detector import yolo_detector as yolo
         if hasattr(yolo, "detect_crops"):
@@ -58,7 +51,6 @@ async def _run_detector_get_crops(image: "np.ndarray") -> List[Any]:
             else:
                 crops = [image]
         else:
-            logger.warning("Detector found but no known detect function; using full image as crop")
             crops = [image]
         if not crops:
             return [image]
@@ -68,17 +60,17 @@ async def _run_detector_get_crops(image: "np.ndarray") -> List[Any]:
         return [image]
 
 
+def _run_ocr_sync(crop: np.ndarray, enable_preprocessing: bool) -> Dict[str, Any]:
+    return run_ocr_multi_pass(crop, enable_preprocessing=enable_preprocessing)
+
+
 async def process_single_image(
     image_bytes: bytes,
     part_id: Optional[str],
     algorithm: str = "aho_corasick",
-    enable_preprocessing: bool = False,  # ← Kept for API compatibility (Saif's decision 💙)
-    db = None,
+    enable_preprocessing: bool = False,
     resize_max: int = 1600
 ) -> Dict[str, Any]:
-    """
-    Full pipeline processing for a single image (async function).
-    """
     global kb_index
 
     try:
@@ -87,22 +79,20 @@ async def process_single_image(
         raise ValueError(f"Failed to decode uploaded image: {e}")
 
     img = resize_image_max(img, max_dim=resize_max)
-
     crops = await _run_detector_get_crops(img)
     primary_crop = crops[0] if crops else img
 
-    # Run OCR
+    loop = asyncio.get_running_loop()
     try:
-        ocr_results = run_ocr_multi_pass(primary_crop, enable_preprocessing=enable_preprocessing)
+        ocr_results = await loop.run_in_executor(
+            _ocr_executor, _run_ocr_sync, primary_crop, enable_preprocessing
+        )
         full_text = ocr_results.get('full_alphanumeric', {}).get('text', '')
         logger.info(f"[OCR] full_alphanumeric.text='{full_text}'")
-        cleaned = ''.join(c for c in full_text if c.isalnum())
-        logger.info(f"[OCR] full_alphanumeric.cleaned='{cleaned}'")
     except Exception as e:
         logger.exception("OCR failed:", exc_info=e)
         raise
 
-    # Verify
     try:
         if algorithm == "regex" and part_id:
             verification = verify_with_regex(ocr_results, part_id, kb_index)
@@ -112,7 +102,7 @@ async def process_single_image(
         logger.exception("Verification failed", exc_info=e)
         raise
 
-    response = {
+    return {
         "status": "success",
         "verdict": verification.verdict,
         "confidence_score": float(verification.confidence_score) if verification.confidence_score is not None else 0.0,
@@ -126,51 +116,32 @@ async def process_single_image(
         "preprocessing_applied": enable_preprocessing,
     }
 
-    # DB logging
-    try:
-        if db is not None:
-            full_text = ocr_results.get("full_text", "")
-            rec_scores = ocr_results.get("rec_scores", [])
-            avg_confidence = sum(rec_scores) / len(rec_scores) if rec_scores else 0.0
-
-            log_doc = {
-                "timestamp": datetime.now(timezone.utc),
-                "part_id": part_id,
-                "algorithm_used": response["algorithm_used"],
-                "preprocessing_applied": enable_preprocessing,
-                "ocr_text": full_text,
-                "ocr_confidence": float(avg_confidence),
-                "verdict": response["verdict"],
-                "confidence_score": response["confidence_score"],
-                "matches": response["matches"],
-                "extracted_fields": response["extracted_fields"],
-                "oem_info": response["oem_info"],
-                "flags": response["flags"],
-                "requires_admin_review": response["requires_admin_review"],
-            }
-            await db.verification_logs.insert_one(log_doc)
-    except Exception as e:
-        logger.warning(f"Failed to write verification log to DB: {e}")
-
-    return response
-
 
 async def process_batch_images(
     files: List[UploadFile],
     part_id: Optional[str],
     algorithm: str,
     enable_preprocessing: bool = False,
-    db = None
 ) -> List[Dict[str, Any]]:
-    async def _process_upload(file: UploadFile):
-        content = await file.read()
-        return await process_single_image(
-            content,
-            part_id,
-            algorithm,
-            enable_preprocessing=enable_preprocessing,
-            db=db
-        )
+    async def _process_upload(file: UploadFile) -> Dict[str, Any]:
+        try:
+            content = await file.read()
+            result = await process_single_image(
+                content,
+                part_id,
+                algorithm,
+                enable_preprocessing=enable_preprocessing,
+            )
+            result["filename"] = file.filename
+            return result
+        except Exception as e:
+            return {
+                "status": "error",
+                "filename": file.filename,
+                "error": str(e),
+                "verdict": "ERROR",
+                "confidence_score": 0.0,
+            }
 
     tasks = [_process_upload(f) for f in files]
     results = await asyncio.gather(*tasks, return_exceptions=False)

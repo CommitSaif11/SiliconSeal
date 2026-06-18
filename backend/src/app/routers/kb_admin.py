@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import json
-from pathlib import Path
 
 from engine.kb_loader import load_raw_kb, validate_entry, KB_FILE
 from pipeline.intelligence.mouser_service import fetch_ic
 from pipeline.intelligence.patterns import build_patterns, normalize_package, logo_from_oem
+from core.auth import require_admin
 
 router = APIRouter()
+
 
 def _upsert_kb_entry(entry: dict):
     kb = load_raw_kb()
@@ -31,12 +32,9 @@ def _upsert_kb_entry(entry: dict):
 
     return {"updated": updated, "count": len(kb)}
 
+
 @router.post("/admin/kb/enrich-and-save")
-async def enrich_and_save(part: str):
-    """
-    Fetch from Mouser, build KB entry, validate, and upsert into kb.json.
-    Returns operation summary.
-    """
+async def enrich_and_save(part: str, _user: dict = Depends(require_admin)):
     data = fetch_ic(part)
     if not data:
         raise HTTPException(status_code=404, detail="IC not found in Mouser")
