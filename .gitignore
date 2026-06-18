@@ -64,4 +64,10 @@ frontend/.env.*
 .DS_Store
 Thumbs.db
 .vscode/
+.idea/
 documentation/
+
+# Claude Code
+.claude/
+CLAUDE.md
+**/CLAUDE.md
