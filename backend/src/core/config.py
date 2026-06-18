@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
     # YOLO
-    YOLO_MODEL_PATH: str
+    YOLO_MODEL_PATH: str = "https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt"
     YOLO_CONFIDENCE: float = 0.25
     YOLO_DEVICE: str = "cpu"
 

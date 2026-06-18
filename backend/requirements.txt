@@ -1,0 +1,28 @@
+# Core
+fastapi>=0.121.3
+uvicorn[standard]>=0.38.0
+gunicorn>=23.0.0
+pydantic-settings>=2.12.0
+python-dotenv>=1.2.1
+python-multipart>=0.0.20
+aiofiles>=25.1.0
+email-validator>=2.3.0
+
+# Auth
+bcrypt>=4.0.0
+python-jose[cryptography]>=3.5.0
+
+# HTTP
+httpx>=0.28.1
+requests>=2.32.5
+
+# CV / ML
+numpy>=1.26.4
+opencv-python-headless>=4.11.0.86
+pillow>=12.0.0
+ultralytics>=8.3.230
+paddlepaddle>=3.0.0
+paddleocr>=3.3.0
+
+# Algorithms
+pyahocorasick>=2.2.0
