@@ -18,11 +18,16 @@ export default function BackendBanner() {
         <>
           <WifiOff className="w-4 h-4 shrink-0" />
           <span>
-            <strong>Backend unreachable.</strong> Start your backend server with{' '}
-            <code className="px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-500/20 font-mono text-xs">
-              uvicorn app.main:app --reload
-            </code>{' '}
-            or check your deployment.
+            <strong>Backend is waking up.</strong> The server sleeps after inactivity — visit{' '}
+            <a
+              href="https://huggingface.co/spaces/Saif-ali-11/siliconseal-api"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-semibold hover:text-red-900 dark:hover:text-red-300"
+            >
+              HF Space
+            </a>{' '}
+            to wake it, then wait ~60 seconds and click retry.
           </span>
         </>
       ) : status === 'degraded' ? (

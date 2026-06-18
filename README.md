@@ -12,10 +12,10 @@ Built for **Bharat Electronics Limited (BEL)** as part of **Smart India Hackatho
 | Service | URL |
 |---------|-----|
 | **Frontend** | [https://siliconseal.onrender.com](https://siliconseal.onrender.com) |
-| **Backend API** | _Deployed on Hugging Face Spaces (link will be updated)_ |
-| **API Docs** | `<backend-url>/docs` (Swagger UI) |
+| **Backend API** | [https://saif-ali-11-siliconseal-api.hf.space](https://saif-ali-11-siliconseal-api.hf.space) |
+| **API Docs** | [https://saif-ali-11-siliconseal-api.hf.space/docs](https://saif-ali-11-siliconseal-api.hf.space/docs) (Swagger UI) |
 
-> **Note:** The backend runs on a free tier and may take 30-60 seconds to wake up on first request. The frontend will show a "Backend unreachable" banner — just wait and click retry.
+> **Note:** The backend runs on Hugging Face Spaces free tier and sleeps after 15 minutes of inactivity. First request after that takes ~60 seconds to wake up. The frontend will show a banner with a link to wake the backend — just click it, wait, and retry.
 
 **Demo credentials:** Username: `admin` | Password: `sih25162admin`
 
@@ -68,10 +68,10 @@ Image Upload → YOLO Detection → PaddleOCR → Pattern Matching → Scoring �
 | Icons | Lucide React |
 
 ### Deployment
-| Service | Platform |
-|---------|----------|
-| Frontend | Render (Static Site) |
-| Backend | Hugging Face Spaces (Docker) |
+| Service | Platform | URL |
+|---------|----------|-----|
+| Frontend | Render (Static Site) | [siliconseal.onrender.com](https://siliconseal.onrender.com) |
+| Backend | Hugging Face Spaces (Docker) | [saif-ali-11-siliconseal-api.hf.space](https://saif-ali-11-siliconseal-api.hf.space) |
 
 ---
 
